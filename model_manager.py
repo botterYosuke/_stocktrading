@@ -1,34 +1,48 @@
 import datetime
-import sqlite3
 
 import numpy as np
 import pandas as pd
-from dateutil.relativedelta import relativedelta
 from sklearn.preprocessing import StandardScaler
-from tensorflow.keras import metrics
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.layers import (
-    LSTM,
-    Bidirectional,
-    Dense,
-    Dropout,
-    InputLayer,
-    SimpleRNN,
-)
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.optimizers import Adam
 
-from data_manager import DataManager
-from library import Library
+from data_source import (
+    load_daily_bars,
+    newest_close_as_of,
+    parse_date,
+    select_pit_bars,
+)
 from misc import Misc
+from signals_writer import write_daily_signals, write_manifest
+
+# TensorFlow/Keras are imported lazily inside compile_model()/fit() so this
+# module can be imported (and the light-weight paths tested) without TF (B2-1).
+
+
+def daily_bars_to_frame(bars):
+    """Adapter: list[DailyBar] -> DataFrame for add_technical_indicators (B2-2).
+
+    Produces the same column shape the legacy SQLite path fed in
+    (date/open/high/low/close/volume), so the existing feature pipeline
+    consumes tier-2 CSV.gz bars (data_source.load_daily_bars) unchanged.
+    """
+    return pd.DataFrame(
+        {
+            "date": [b.date for b in bars],
+            "open": [b.open for b in bars],
+            "high": [b.high for b in bars],
+            "low": [b.low for b in bars],
+            "close": [b.close for b in bars],
+            "volume": [b.volume for b in bars],
+        }
+    )
 
 
 class ModelManager:
-    def __init__(self):
-        self.dm = DataManager()
-        self.df_stock_list = self.dm.load_stock_list()
-
+    def __init__(self, cache_dir=None):
+        # Brain is self-contained on tier-2 CSV.gz; no SQLite/DataManager (B2-3).
+        self.cache_dir = cache_dir
         self.window = 30
+        self.train_window_business_days = 80
+        self.codes = []
 
     def add_technical_indicators(self, df):
         # 日付をインデックスにする
@@ -85,6 +99,16 @@ class ModelManager:
         return df
 
     def compile_model(self, shape1, shape2, rnn_layer):
+        from tensorflow.keras import metrics
+        from tensorflow.keras.layers import (
+            Bidirectional,
+            Dense,
+            Dropout,
+            InputLayer,
+        )
+        from tensorflow.keras.models import Sequential
+        from tensorflow.keras.optimizers import Adam
+
         model = Sequential()
         model.add(InputLayer(shape=(shape1, shape2)))
         model.add(Bidirectional(rnn_layer))
@@ -101,27 +125,40 @@ class ModelManager:
 
         return model
 
-    def prepare_data(self):
+    def prepare_data(self, as_of):
+        """Point-in-time data prep: only bars dated <= as_of are read (B2-3)."""
         scaler = StandardScaler()
         dict_df = {}
         dict_close = {}
 
-        today = datetime.date.today()
-        ago = (today - relativedelta(months=4)).strftime("%Y-%m-%d")
+        as_of_date = parse_date(as_of)
+        start = as_of_date - datetime.timedelta(days=180)
+        bars_by_code = load_daily_bars(
+            cache_dir=self.cache_dir, start=start, end=as_of_date
+        )
+        self.bars_by_code = bars_by_code
+        pit = select_pit_bars(
+            bars_by_code, as_of_date, train_window=self.train_window_business_days
+        )
 
-        for code in self.df_stock_list["code"]:
-            df = self.dm.load_stock_data(code, start=ago, end="end")
-            df = self.add_technical_indicators(df)
+        for code, bars in pit.items():
+            df = self.add_technical_indicators(daily_bars_to_frame(bars))
+            if len(df) <= self.window:
+                continue
             dict_df[code] = pd.DataFrame(scaler.fit_transform(df))
             dict_close[code] = df["close"]
 
+        self.codes = list(dict_df.keys())
         return dict_df, dict_close
 
     def fit(self, dict_df, dict_close, per, opt_model):
+        from tensorflow.keras.callbacks import EarlyStopping
+        from tensorflow.keras.layers import LSTM, SimpleRNN
+
         list_X, list_y = [], []
         window = self.window
 
-        for code in self.df_stock_list["code"]:
+        for code in self.codes:
             df = dict_df[code]
             cl = dict_close[code]
 
@@ -155,22 +192,24 @@ class ModelManager:
 
         return model
 
-    def predict(self, model, dict_df):
+    def predict(self, model, dict_df, as_of):
         list_result = []
         window = self.window
 
-        for code, brand in zip(self.df_stock_list["code"], self.df_stock_list["brand"]):
+        for code in self.codes:
             array_X = np.array(dict_df[code].tail(window))
             y_pred = model.predict(np.array([array_X]), verbose=0)
-            list_result.append([code, brand, y_pred[0][0]])
+            list_result.append([code, y_pred[0][0]])
 
-        df_result = pd.DataFrame(list_result, columns=["code", "brand", "pred"])
+        df_result = pd.DataFrame(list_result, columns=["code", "pred"])
         df_extract = df_result[df_result["pred"] >= 0.7].copy()
 
-        # nbd = datetime.date.today().strftime("%Y-%m-%d")
-        nbd = Misc.get_next_business_day(datetime.date.today()).strftime("%Y-%m-%d")
-        df_extract.loc[:, "date"] = nbd
-        df_extract = df_extract[["date", "code", "brand", "pred"]]
+        nbd = Misc.get_next_business_day(parse_date(as_of)).strftime("%Y-%m-%d")
+        # Empty-safe: `.loc[:, "date"] = nbd` raises on a 0-row frame; plain
+        # column assignment yields an empty [date, code, pred] frame instead of
+        # crashing when no code clears the threshold (B2 empty-guard).
+        df_extract["date"] = nbd
+        df_extract = df_extract[["date", "code", "pred"]]
 
         return df_extract
 
@@ -180,22 +219,20 @@ if __name__ == "__main__":
     # if Misc.check_day_type(datetime.date.today()):
     #     exit()
 
-    dm = DataManager()
-    lib = Library()
-
     mm = ModelManager()
+    as_of = datetime.date.today()
 
-    # データを準備する
-    dict_df, dict_close = mm.prepare_data()
+    # データを準備する（point-in-time: as_of 以前のみ）
+    dict_df, dict_close = mm.prepare_data(as_of)
 
     # ショートモデルを学習する
     model = mm.fit(dict_df, dict_close, per=0.995, opt_model="lstm")
-    df_short = mm.predict(model, dict_df)
+    df_short = mm.predict(model, dict_df, as_of)
     df_short.loc[:, "side"] = 1
 
     # ロングモデルを学習する
     model = mm.fit(dict_df, dict_close, per=1.005, opt_model="lstm")
-    df_long = mm.predict(model, dict_df)
+    df_long = mm.predict(model, dict_df, as_of)
     df_long.loc[:, "side"] = 2
 
     # 予測結果を統合する
@@ -208,8 +245,8 @@ if __name__ == "__main__":
 
     # 不適切な銘柄は除外する
     for index, row in df.iterrows():
-        close_price = dm.find_newest_close_price(row["code"])
-        if (700 < close_price < 6000) and not lib.examine_regulation(row["code"]):
+        close_price = newest_close_as_of(mm.bars_by_code, row["code"], as_of)
+        if 700 < close_price < 6000:
             selected_indices.append(index)
     df = df.loc[selected_indices, :]
 
@@ -222,10 +259,26 @@ if __name__ == "__main__":
         replace=False,
         p=probabilities,
     )
-    df = df.loc[sampled_indices, ["date", "code", "brand", "pred", "side"]]
+    df = df.loc[sampled_indices, ["date", "code", "pred", "side"]]
     df = df.sort_values("pred", ascending=False).reset_index()
-    df = df[["date", "code", "brand", "pred", "side"]]
+    df = df[["date", "code", "pred", "side"]]
 
-    conn = sqlite3.connect(dm.db)
-    with conn:
-        df.to_sql("Target", conn, if_exists="append", index=False)
+    # signals JSON として出力する（SQLite Target の置き換え, B2-4）
+    rows = [
+        {"code": row["code"], "pred": row["pred"], "side": row["side"]}
+        for _, row in df.iterrows()
+    ]
+    target_date = df["date"].iloc[0]
+
+    signal_path = write_daily_signals(
+        output_dir="signals",
+        target_date=target_date,
+        as_of=as_of,
+        rows=rows,
+    )
+    write_manifest(
+        output_dir="signals",
+        start=target_date,
+        end=target_date,
+        signal_files=[signal_path],
+    )

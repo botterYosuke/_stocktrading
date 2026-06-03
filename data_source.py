@@ -117,6 +117,30 @@ def load_daily_bars(
     return bars_by_code
 
 
+def select_pit_bars(
+    bars_by_code: dict[str, list[DailyBar]],
+    as_of: str | date,
+    *,
+    train_window: int = 80,
+) -> dict[str, list[DailyBar]]:
+    """Point-in-time universe + window selection (stdlib, pandas-free).
+
+    For each code, keep only bars dated <= as_of and take the most recent
+    ``train_window`` of them. Codes with fewer than ``train_window`` bars at or
+    before as_of are dropped from the universe. Guarantees no look-ahead: no
+    returned bar is dated after as_of (B2-6).
+    """
+    cutoff = parse_date(as_of)
+    selected: dict[str, list[DailyBar]] = {}
+    for code, bars in bars_by_code.items():
+        pit = [bar for bar in bars if bar.date <= cutoff]
+        if len(pit) < train_window:
+            continue
+        pit.sort(key=lambda b: b.date)
+        selected[code] = pit[-train_window:]
+    return selected
+
+
 def newest_close_as_of(
     bars_by_code: dict[str, list[DailyBar]],
     code: str,
