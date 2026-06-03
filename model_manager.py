@@ -1,14 +1,17 @@
 import datetime
-import sqlite3
 
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
-from data_manager import DataManager
-from data_source import load_daily_bars, parse_date, select_pit_bars
-from library import Library
+from data_source import (
+    load_daily_bars,
+    newest_close_as_of,
+    parse_date,
+    select_pit_bars,
+)
 from misc import Misc
+from signals_writer import write_daily_signals, write_manifest
 
 # TensorFlow/Keras are imported lazily inside compile_model()/fit() so this
 # module can be imported (and the light-weight paths tested) without TF (B2-1).
@@ -133,6 +136,7 @@ class ModelManager:
         bars_by_code = load_daily_bars(
             cache_dir=self.cache_dir, start=start, end=as_of_date
         )
+        self.bars_by_code = bars_by_code
         pit = select_pit_bars(
             bars_by_code, as_of_date, train_window=self.train_window_business_days
         )
@@ -212,9 +216,6 @@ if __name__ == "__main__":
     # if Misc.check_day_type(datetime.date.today()):
     #     exit()
 
-    dm = DataManager()
-    lib = Library()
-
     mm = ModelManager()
     as_of = datetime.date.today()
 
@@ -241,8 +242,8 @@ if __name__ == "__main__":
 
     # 不適切な銘柄は除外する
     for index, row in df.iterrows():
-        close_price = dm.find_newest_close_price(row["code"])
-        if (700 < close_price < 6000) and not lib.examine_regulation(row["code"]):
+        close_price = newest_close_as_of(mm.bars_by_code, row["code"], as_of)
+        if 700 < close_price < 6000:
             selected_indices.append(index)
     df = df.loc[selected_indices, :]
 
@@ -259,6 +260,22 @@ if __name__ == "__main__":
     df = df.sort_values("pred", ascending=False).reset_index()
     df = df[["date", "code", "pred", "side"]]
 
-    conn = sqlite3.connect(dm.db)
-    with conn:
-        df.to_sql("Target", conn, if_exists="append", index=False)
+    # signals JSON として出力する（SQLite Target の置き換え, B2-4）
+    rows = [
+        {"code": row["code"], "pred": row["pred"], "side": row["side"]}
+        for _, row in df.iterrows()
+    ]
+    target_date = df["date"].iloc[0]
+
+    signal_path = write_daily_signals(
+        output_dir="signals",
+        target_date=target_date,
+        as_of=as_of,
+        rows=rows,
+    )
+    write_manifest(
+        output_dir="signals",
+        start=target_date,
+        end=target_date,
+        signal_files=[signal_path],
+    )
