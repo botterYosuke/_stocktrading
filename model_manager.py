@@ -5,22 +5,32 @@ import numpy as np
 import pandas as pd
 from dateutil.relativedelta import relativedelta
 from sklearn.preprocessing import StandardScaler
-from tensorflow.keras import metrics
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.layers import (
-    LSTM,
-    Bidirectional,
-    Dense,
-    Dropout,
-    InputLayer,
-    SimpleRNN,
-)
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.optimizers import Adam
 
 from data_manager import DataManager
 from library import Library
 from misc import Misc
+
+# TensorFlow/Keras are imported lazily inside compile_model()/fit() so this
+# module can be imported (and the light-weight paths tested) without TF (B2-1).
+
+
+def daily_bars_to_frame(bars):
+    """Adapter: list[DailyBar] -> DataFrame for add_technical_indicators (B2-2).
+
+    Produces the same column shape the legacy SQLite path fed in
+    (date/open/high/low/close/volume), so the existing feature pipeline
+    consumes tier-2 CSV.gz bars (data_source.load_daily_bars) unchanged.
+    """
+    return pd.DataFrame(
+        {
+            "date": [b.date for b in bars],
+            "open": [b.open for b in bars],
+            "high": [b.high for b in bars],
+            "low": [b.low for b in bars],
+            "close": [b.close for b in bars],
+            "volume": [b.volume for b in bars],
+        }
+    )
 
 
 class ModelManager:
@@ -85,6 +95,16 @@ class ModelManager:
         return df
 
     def compile_model(self, shape1, shape2, rnn_layer):
+        from tensorflow.keras import metrics
+        from tensorflow.keras.layers import (
+            Bidirectional,
+            Dense,
+            Dropout,
+            InputLayer,
+        )
+        from tensorflow.keras.models import Sequential
+        from tensorflow.keras.optimizers import Adam
+
         model = Sequential()
         model.add(InputLayer(shape=(shape1, shape2)))
         model.add(Bidirectional(rnn_layer))
@@ -118,6 +138,9 @@ class ModelManager:
         return dict_df, dict_close
 
     def fit(self, dict_df, dict_close, per, opt_model):
+        from tensorflow.keras.callbacks import EarlyStopping
+        from tensorflow.keras.layers import LSTM, SimpleRNN
+
         list_X, list_y = [], []
         window = self.window
 
