@@ -1,0 +1,3 @@
+[submodule "vendor/The-Trader-Was-Replaced"]
+	path = vendor/The-Trader-Was-Replaced
+	url = https://github.com/botterYosuke/The-Trader-Was-Replaced.git
