@@ -120,6 +120,40 @@ class GeneratorTests(unittest.TestCase):
             self.assertEqual(m["files"], ["signals_2021-06-04.json", "signals_2021-06-08.json"])
             self.assertEqual(m["instruments"], ["7203.TSE", "9984.TSE"])
 
+    def test_run_range_orchestration_resume_force_aggregate(self) -> None:
+        from daily_generator import run_range
+        from signals_writer import write_daily_signals
+
+        calls = []
+
+        def fake_gen(*, model_manager, as_of, target_date, out_dir, models_root, model_params):
+            calls.append((target_date, as_of))
+            write_daily_signals(
+                output_dir=out_dir, target_date=target_date, as_of=as_of,
+                rows=[{"code": "7203", "pred": 0.8, "side": 2}],
+            )
+
+        with tempfile.TemporaryDirectory() as td:
+            mp = run_range("2021-06-04", "2021-06-08", td, generate_one=fake_gen)
+            # loop covers the 3 business days, as_of = prev business day
+            self.assertEqual([c[0] for c in calls],
+                             ["2021-06-04", "2021-06-07", "2021-06-08"])
+            self.assertEqual([c[1] for c in calls],
+                             ["2021-06-03", "2021-06-04", "2021-06-07"])
+            m = json.loads(Path(mp).read_text(encoding="utf-8"))
+            self.assertEqual(
+                m["files"],
+                ["signals_2021-06-04.json", "signals_2021-06-07.json", "signals_2021-06-08.json"],
+            )
+            # 2nd run -> resume skips everything (valid signals already present)
+            calls.clear()
+            run_range("2021-06-04", "2021-06-08", td, generate_one=fake_gen)
+            self.assertEqual(calls, [])
+            # --force -> regenerate all
+            run_range("2021-06-04", "2021-06-08", td, force=True, generate_one=fake_gen)
+            self.assertEqual([c[0] for c in calls],
+                             ["2021-06-04", "2021-06-07", "2021-06-08"])
+
 
 if __name__ == "__main__":
     unittest.main()

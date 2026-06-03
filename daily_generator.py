@@ -13,6 +13,7 @@ from pathlib import Path
 
 from data_source import parse_date
 from misc import Misc
+from model_cache import DEFAULT_MODEL_PARAMS
 from signals_writer import is_valid_signals_file, write_manifest
 
 
@@ -85,6 +86,68 @@ def aggregate_manifest(out_dir, start, end) -> Path:
     )
 
 
+def _generate_one_date(*, model_manager, as_of, target_date, out_dir, models_root, model_params):
+    """Real one-date generation (B3-6): prepare_data(as_of) -> model cache
+    hit(load)/miss(fit+save) -> predict UP/DOWN -> price-band -> emit_daily_signals.
+    Heavy (pandas/TF); imported lazily so the orchestration stays importable/testable.
+    """
+    import pandas as pd
+
+    import model_cache
+    from data_source import newest_close_as_of
+    from model_manager import ModelManager, emit_daily_signals
+
+    mm = model_manager if model_manager is not None else ModelManager()
+    dict_df, dict_close = mm.prepare_data(as_of)
+    codes, tw = mm.codes, mm.train_window_business_days
+
+    if model_cache.is_hit(models_root, as_of, tw, codes, model_params):
+        key = model_cache.cache_key(as_of, tw, codes, model_params)
+        up_model, down_model = model_cache.load_models(models_root, key)
+    else:
+        up_model = mm.fit(dict_df, dict_close, per=model_params["per_up"], opt_model=model_params["layer"])
+        down_model = mm.fit(dict_df, dict_close, per=model_params["per_down"], opt_model=model_params["layer"])
+        model_cache.save_models(models_root, as_of, tw, codes, model_params, up_model, down_model)
+
+    df_up = mm.predict(up_model, dict_df, as_of)
+    df_up["side"] = 2
+    df_down = mm.predict(down_model, dict_df, as_of)
+    df_down["side"] = 1
+    df = pd.concat([df_up, df_down]).sort_values("pred", ascending=False).drop_duplicates(
+        subset=["code"], keep="first"
+    )
+    sel = [i for i, r in df.iterrows() if 700 < newest_close_as_of(mm.bars_by_code, r["code"], as_of) < 6000]
+    df = df.loc[sel, ["date", "code", "pred", "side"]]
+    emit_daily_signals(df, as_of, output_dir=out_dir)
+
+
+def run_range(start, end, out_dir, force=False, *, model_manager=None,
+              models_root="models", model_params=None, generate_one=None) -> Path:
+    """Orchestrate point-in-time daily generation over ``[start, end]`` (B3-6).
+
+    For each business ``target_date`` that needs (re)generation (resume / --force),
+    map ``as_of = prev_business_day`` and run the one-date generation, then write
+    the aggregated range manifest. ``generate_one`` is injectable so the loop /
+    resume / aggregation can be tested without TF; the default trains real models.
+    """
+    params = model_params or DEFAULT_MODEL_PARAMS
+    gen = generate_one if generate_one is not None else _generate_one_date
+    for d in enumerate_business_days(start, end):
+        target_date = d.isoformat()
+        if not should_generate(out_dir, target_date, force):
+            continue
+        as_of = Misc.prev_business_day(d).isoformat()
+        gen(
+            model_manager=model_manager,
+            as_of=as_of,
+            target_date=target_date,
+            out_dir=out_dir,
+            models_root=models_root,
+            model_params=params,
+        )
+    return aggregate_manifest(out_dir, start, end)
+
+
 def main(argv=None) -> list[dict]:
     parser = argparse.ArgumentParser(
         prog="daily_generator",
@@ -109,8 +172,8 @@ def main(argv=None) -> list[dict]:
     plan = plan_runs(args.start, args.end, out_dir=args.out, force=args.force)
     for row in plan:
         print(f"{row['target_date']} <- as_of {row['as_of']} [{row['action']}]")
-    # NOTE: signal generation (prepare_data/fit/predict/emit_daily_signals) and
-    # model cache reuse are wired in the final loop step. args.out drives resume.
+    if not args.dry_run:
+        run_range(args.start, args.end, args.out, force=args.force)
     return plan
 
 
