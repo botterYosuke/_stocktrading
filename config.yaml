@@ -1,30 +1,6 @@
-api:
-  kabu_station:
-    ip_address: ${IPAddress}
-    port: ${Port}
-    api_password: ${APIPassword_production}
-    timeout_sec: 36000
-  jpx:
-    email: ${Email}
-    password: ${JPXPassword}
-    base_url: "https://api.jquants.com/v1"
-
-directory:
-  base_dir: ${BaseDir}
-    
-database:
-  name: "stock_database.db"
-
 config:
   log_conf_file: "log_conf.yaml"
   log_messages: "log_messages.yaml"
-
-trading:
-  base_transaction: ${BaseTransaction}
-  allowable_risk: ${AllowableRisk}
-  polling_interval: 30
-  polling_interval_variation: 35
-  monitor_interval: 1800
 
 model:
   window_size: 30

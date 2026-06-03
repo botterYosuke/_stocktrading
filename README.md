@@ -1,271 +1,105 @@
-# 機械学習を応用した日本株の自動売買プログラム
+# 機械学習による日本株シグナル予測器（頭脳）
 
 > [!CAUTION]
-> - 本プログラムを使用することによって被った損害等について、制作者（藤田）は一切の責任を負いません。投資はご自身の判断と責任のもとで行ってください。
+> - 本プログラムを使用することによって被った損害等について、制作者は一切の責任を負いません。投資はご自身の判断と責任のもとで行ってください。
 > - 本プログラムから得られた投資判断は、特定銘柄の取引を推奨するものではありません。
 > - 本プログラムの使用にあたっては、コードを慎重にレビューした上で、その動作原理を熟知しておくことを推奨します。
-> - 本プログラムを clone/fork した時点で、[ライセンス](https://github.com/hajime-f/stocktrading?tab=License-1-ov-file#readme)に同意したものとみなします。
+
+このリポジトリは **ML 予測の「頭脳」** です。日足データから point-in-time で深層学習モデルを学習し、翌営業日の売買シグナルを **JSON 契約**として出力します。
+
+**取引の実行（建玉・ロスカット・発注ガード・kabu/立花 API 連携）は本リポジトリにはありません。** 実行は別リポジトリ [The-Trader-Was-Replaced（TTWR）](https://github.com/botterYosuke/The-Trader-Was-Replaced) が担い、両者は `signals/` の日次 JSON ＋ `manifest.json` を境界契約として疎結合に連携します（Replay／Live 共通）。
+
+```
+_stocktrading（本リポジトリ）: CSV.gz(日足) -> point-in-time LSTM(UP/DOWN) -> signals_YYYY-MM-DD.json + manifest.json
+TTWR                         : manifest/instruments_ref で購読 -> 日次 signals を正本に 寄り建て/引け返済/ロスカット/発注ガード
+```
 
 # 動作環境
 
-- Python 3.12\
-2025年3月現在において、TensorFlow が Python 3.13 に対応していないため、Python 3.12 を使用します。3.13 では動作しませんので、ご注意ください。
-- kabuステーションAPI\
-三菱UFJ eスマート証券が提供する[株取引専用のAPI](https://kabucom.github.io/kabusapi/ptal/)を使用します。証券口座の開設と API の使用環境が別途必要です。
-- J-Quants API\
-日本取引所グループが提供する[株情報取得のためのAPI](https://jpx-jquants.com/)を使用します。無料プランで十分です。
+- **Python 3.12**（TensorFlow が 3.13 以降に未対応のため必須。3.13 では動作しません）
+- **J-Quants の日足 CSV.gz キャッシュ**：環境変数 `DEV_J_QUANTS_CACHE` が指すディレクトリの `equities_bars_daily_*.csv.gz`（TTWR と共有する素データ）。本リポジトリは stdlib で直読し、nautilus には依存しません。
+- **TTWR submodule**（`vendor/The-Trader-Was-Replaced`）：データ系譜・契約・listed-symbols の参照用。頭脳は `engine` を import しません。
 
-# 基本的な使い方
-
-## 1. 仮想環境の作成
-
-仮想環境を作ってください。前述のとおり、Python 3.12 の環境が必要です。
+# セットアップ
 
 ```
-$ python -m venv env
-```
-
-## 2. パッケージのインストール
-
-仮想環境に入って ```make install``` してください。
-
-```
+$ python3.12 -m venv env
 $ source ./env/bin/activate
 (env) $ make install
+$ git submodule update --init   # vendor/The-Trader-Was-Replaced
 ```
 
-## 3. .env ファイルの追加
-
-プログラムディレクトリの直下に、下記のようにパスワード等を記録した .env ファイルを配置してください。
+プログラム直下に `.env` を置きます（`config_manager` が読み込みます）。
 
 ```:.env
-APIPassword_production=XXXX
-IPAddress=127.0.0.1
-Port=18080
-BaseDir=/path/to/dir/stocktrading
-LogConfigFile=log_conf.yaml
-Email=your@mailaddress.com
-JPXPassword=YYYY
-BaseTransaction=1
-AllowableRisk=250000
+BaseDir=/path/to/_stocktrading
+DEV_J_QUANTS_CACHE=/path/to/jquants-cache
 ```
 
-- APIPassword_production：三菱UFJ eスマート証券から発行される API パスワード（本番用）
-- IPAddress：kabu ステーションが動作する Windows マシンの IP アドレス
-- Port：上記 Windows マシンのポート番号
-- BaseDir：本プログラムが格納されている「stocktrading」ディレクトリへの絶対パス
-- LogConfigFile：ログ出力の設定を記載した YAML ファイルの名前
-- Email：J-Quants API に登録したメールアドレス
-- JPXPassword：J-Quants API に登録したパスワード
-- BaseTransaction：取引単位。この値を N にすると、単元株（通常100株）x N の取引を行う。
-- AllowableRisk：許容リスク（後述）
+- `BaseDir`：本リポジトリの絶対パス（`config.yaml` の解決に使用）
+- `DEV_J_QUANTS_CACHE`：J-Quants 日足 CSV.gz の格納ディレクトリ
 
-## 4. データベースの初期化
+# 使い方
 
-株価データを取得してデータベースを初期化します。なお、下記コマンドは新しいデータ（当日分の株価）の取り込みにも使うので、更新のために毎日実行する必要があります。
-
-```
-(env) $ make init
-```
-
-## 5. 予測モデルの学習と予測
-
-日足の値動きを予測するモデルを学習させ、次営業日の株価の動きを予測します。
+## 単日（当日 as_of → 翌営業日のシグナル）
 
 ```
 (env) $ make predict
 ```
 
-## 6. 取引の開始
+`signals/signals_<翌営業日>.json` と `signals/manifest.json` を生成します。
 
-下記のコマンドを打つと、前日の予測結果に基づいて取引が始まります。
+## 日付レンジの point-in-time 生成（再開可能・モデルキャッシュ付き）
 
 ```
-(env) $ make
+(env) $ make generate START=2021-06-04 END=2021-06-08
+# = python daily_generator.py --start 2021-06-04 --end 2021-06-08 --out signals
 ```
+
+- 各営業日 `target_date` ごとに `as_of = 前営業日` で学習・予測し `signals_<target_date>.json` を出力。
+- モデルは `models/<key>/{up,down}.keras + meta.json` にキャッシュ（同一 `as_of`／窓／ユニバース／パラメータなら再学習せず再利用）。
+- 既に valid な `signals_<date>.json` があれば skip（`--force` で再生成）。
+- 最後に `manifest.json`（`files` 日付昇順、`instruments` は全 signals の和集合）を集約。
+- `--dry-run` で `target_date <- as_of [generate/skip]` の計画のみ表示。
+
+# 出力契約（境界の正本）
+
+`signals/signals_YYYY-MM-DD.json`：
+
+```json
+{
+  "schema_version": 1,
+  "target_date": "2026-06-04",
+  "as_of": "2026-06-03",
+  "signals": [
+    {"symbol": "7203.TSE", "side": "LONG",  "confidence": 0.83, "code": "7203"},
+    {"symbol": "6758.TSE", "side": "SHORT", "confidence": 0.79, "code": "6758"}
+  ],
+  "regulation_filter": {"brain": "disabled", "replay": "not_available", "live": "pre_trade_check"}
+}
+```
+
+- `side`：`LONG`（買い）／`SHORT`（売り）。`confidence ∈ (0, 1]`。`symbol = {code}.TSE`。
+- 信用規制チェックは頭脳では行いません（`regulation_filter.brain = disabled`）。Live の発注直前で TTWR が弾きます。
+- 契約の詳細は TTWR の Issue `botterYosuke/The-Trader-Was-Replaced#119` を参照。
 
 # 投資判断アルゴリズムの概要
 
-本プログラムは、下記の２種類の予測モデルを使います。
+下記の 2 種類の深層学習モデル（Bidirectional LSTM）を使います。
 
-- 翌営業日の終値が当日の終値から 0.5 ％超上がるか否かを予測するモデル（UP モデル）
-- 翌営業日の終値が当日の終値から 0.5 ％超下がるか否かを予測するモデル（DOWN モデル）
+- 翌営業日の終値が当日終値から一定割合（既定 +0.5%）超**上がる**か否かを予測する **UP モデル**
+- 同じく一定割合（既定 -0.5%）超**下がる**か否かを予測する **DOWN モデル**
 
-これらは、時系列データ（過去の株価）に基づいて、上がる（クラス1）か上がらない（クラス0）か、または、
-下がる（クラス1）か下がらない（クラス0）かを予測する深層学習モデルです。
+`as_of` 以前の直近 `train_window_business_days`（既定 80 営業日）だけで学習し（lookahead 排除）、特徴量（移動平均・MACD・ボリンジャーバンド・RSI とそれらの乖離率など）を入力に、未知の直近系列に対して 0〜1 の確信度を付与します。
 
-深層学習モデルといえども、カオティックな株価の値動きを正確に予測することはできません。
-したがって、当たり前ですが「百発百中で必ず儲かる環境」を実現することは不可能です。
+1. 全銘柄に「値上がり度」（UP の確信度）を付与
+2. 全銘柄に「値下がり度」（DOWN の確信度）を付与
+3. しきい値（既定 0.7）を上回る銘柄を「値上がり／値下がり銘柄」として特定（両方に入る場合は高い側を採用）
+4. 価格帯フィルタ（700 < 終値 < 6000）で不適切な銘柄を除外
+5. 確信度に比例した確率的サンプリングで最大 50 銘柄を抽出し、`signals` として出力
 
-しかし、その予測がまったくのデタラメかといえば、そうではありません。
-「完璧に当たる」と「全然当たらない」を両端に置いたとき、やや「当たる」側に振れています。
-そして、そのわずかな振れ幅から勝機を生み出し、利益を拾うことなら可能です。
+抽出した銘柄を実際にどう建て・返済し、どうロスカットするか（許容リスク配分・寄り建て／引け返済など）は **TTWR 側の戦略**が担います。
 
-このように、本プログラムは、不確かな予測でも儲かるアルゴリズムを追求しています。
-具体的には、下記のオペレーションを実行します。
+# ライセンス
 
-1. 全銘柄に対して「値上がり度」を計算する
-2. 全銘柄に対して「値下がり度」を計算する
-3. しきい値を使って「値上がり銘柄」と「値下がり銘柄」を特定する
-4. これらの値にしたがって翌営業日に売買する銘柄を 50 個抽出する
-5. 上記で抽出した銘柄を取引する
-
-## 1. 全銘柄に対して「値上がり度」を計算する
-
-前述した UP モデルは、クラス 1（上がる）または 0（上がらない）を学習しています。
-そのため、未知の株価データ（直近 N 日間の終値）に対して予測すれば、「値上がりの確信度（値上がり度）はどれくらいか」を、0〜1の値で評価できます。
-
-これにより、全銘柄に対して「値上がり度」を付与します。
-
-## 2. 全銘柄に対して「値下がり度」を計算する
-
-同様に、DOWN モデルについても、全銘柄に対して「値下がり度」を付与します。
-
-## 3. しきい値を使って「値上がり銘柄」と「値下がり銘柄」を特定する
-
-値上がり度が所定のしきい値（2025年7月現在で 0.7 を採用）を上回る銘柄を、「値上がり銘柄」として特定します。
-同様に、値下がり度がしきい値を上回る銘柄を「値下がり銘柄」として特定します。
-
-この時点で、下記の２つの集合が完成します。
-
-- しきい値を上回る値上がり度 $P=(p_1, p_2, \cdots , p_N)$ を有する「値上がり銘柄」の集合（N は値上がり銘柄の数）
-- しきい値を上回る値下がり度 $Q=(q_1, q_2, \cdots , q_M)$ を有する「値下がり銘柄」の集合（M は値下がり銘柄の数）
-
-ただし、両方の集合に入ってしまう銘柄がまれにあるので、その場合は、高い値をとる方を集合に残し、他方は削除します。
-
-## 4. これらの値にしたがって翌営業日に売買する銘柄を 50 個抽出する
-
-最大 $N+M$ 個の銘柄のなかから、翌営業日に売買する銘柄を 50 個抽出します。具体的には、P U Q に属する値にしたがってサンプリングし、50 の銘柄を選抜します（例えば、0.98 の値を持つ銘柄は、0.75 の値を持つ銘柄より、1.31 倍選ばれやすい）。
-
-なお、50 に限定するのは、kabu ステーション API の仕様上、一度に扱える銘柄の数が 50 と定められているからです。
-
-## 5. 上記で抽出した銘柄を取引する
-
-値上がりを予測した銘柄については、始値で買って終値で売り（買い建玉）、値下がりを予測した銘柄については、始値で売って終値で買い戻します（売り建玉）。
-
-ただし、許容リスクから算出される許容ロスを上回ったときは、引けを待たずにロスカットします。
-
-# 許容リスクとロスカット
-
-許容リスクとは、その日の取引で被り得るロス（損失）の基本単位です。つまり、すべての銘柄に対する予測が大きく外れるという最悪の事態が生じても、ロスは「許容リスク x 取引単位」を超えません。
-
-例えば、AllowableRisk を 250000、BaseTransaction を 3 に設定していた場合、ロスが 750,000 円を超えるまでにすべてロスカットされます。
-
-
-# 【番外１】API利用までの流れ
-
-kabuステーションAPIを利用可能にするまでには、越えなければならない山がいくつかあります。\
-以下では、その乗り越え方を説明します。
-
-## 三菱UFJ eスマート証券に証券口座を開設する
-
-[トップページ](https://kabu.com/)から「口座開設」を選択し、ガイダンスに沿って必要事項を入力していけば口座が開設できます。\
-なお、口座は「特定口座 源泉徴収あり」にしておきましょう。「源泉徴収なし」にすると確定申告が面倒なので。
-
-## kabuステーションをインストールする
-
-Windowsマシンにkabuステーションをインストールします。\
-なお、Windowsマシンは実機である必要はありません。私は[Parallels](https://www.parallels.com/jp/)上で動作する仮想Windowsマシンでkabuステーションを動作させています。
-
-## APIの利用設定を行う
-
-[このガイダンス](https://kabucom.github.io/kabusapi/ptal/howto.html)に沿って利用設定を進めます。\
-しかし、kabuステーションAPIの「状態」が「利用可」にならず、途中でつまづくと思います。
-
-これは、APIを利用するためには「Professionalプラン」である必要があるのですが、現段階ではその条件を満たしておらず、「通常プラン」でしかないからです。
-
-## Professionalプラン移行のための条件を満たす
-
-[このページ](https://kabu.com/tool/kabustation/default.html)の「ご利用プランについて」の記載によれば、Professionalプラン移行には次の2つの条件を満たす必要があります。
-
-1. 信用取引口座または、先物オプション取引口座開設済み
-2. 前々々月～前営業日で当社全取引における約定回数が1回以上ある
-
-1については信用取引の口座を開設するだけなので簡単なのですが、問題は2です。とにかくなんでもいいので株取引を少なくとも１回約定させ、取引実績を作る必要があります。
-
-私は、銘柄1475（iシェアーズ・コア TOPIX ETF）を買ってすぐ売却しました。この銘柄は値段が安く、10株単位で取引できるので、数千円あれば取引実績を作ることができます。
-
-## APIの利用設定を行う（再）
-
-約定の翌営業日に、APIの利用設定ができるようになっているはずです。
-
-## APIシステム設定を行う
-
-kabuステーションを起動し、[このページ](https://kabucom.github.io/kabusapi/ptal/howto.html)のガイダンスに沿って「APIシステム設定」を進めます。このガイダンスに記載のとおり、kabuステーションの画面右上のアイコンが緑色になっていることを確認しましょう。
-
-# 【番外２】Macを使った環境の構築方法
-
-「kabuステーションAPI」は、[「kabuステーション」](https://kabu.com/kabustation/default.html)と呼ばれる株取引専用ソフトウェアを経由しなければ使用できません。つまり、原則としてkabuステーションが動作するPC上でプログラムを実行することが求められ、このとき「localhost」をホストに指定して各エンドポイントにアクセスすることになります。
-
-しかし、残念ながら、kabuステーションはWindows版しか提供されていません。\
-そのため、Macでプログラムを開発・実行するためには、テクニカルな工夫が必要になります。
-
-以下では、Macにおける開発環境の構築方法について説明します。
-
-## nginx をインストールする
-
-kabuステーションが動作するWindowsマシンに、[nginx](https://nginx.org/en/)をインストールしてください。
-
-そして、その設定を下記のように書き換えます。
-```
-worker_processes  1;
-events {
-    worker_connections  1024;
-}
-http {
-    include       mime.types;
-    default_type  application/octet-stream;
-    sendfile        on;
-    keepalive_timeout  65;
-
-    map $http_upgrade $connection_upgrade { 
-    default upgrade;
-    ''      close;
-    } 
-
-    server {
-        listen       80;
-        server_name  localhost;
-
-        proxy_http_version 1.1;
-        proxy_set_header Host localhost;
-        proxy_set_header Upgrade $http_upgrade; 
-        proxy_set_header Connection $connection_upgrade;
-
-        location / {
-            proxy_pass   http://127.0.0.1:18080/;
-        }
-    }
-}
-```
-上記のように設定ファイル（nginx.conf）を書き換えたら、nginxを起動します。
-
-## WindowsマシンのローカルIPアドレスを調べる
-
-WindowsマシンのローカルIPアドレスを調べてください。コマンドプロンプトで```$ ipconfig /all```と打てば表示されます。
-
-## .envファイルを書き換える
-
-本プログラムのディレクトリ直下にある```.env```を下記のように書き換えてください。
-
-```:.env
-APIPassword_production=XXXXX ← 証券会社から付与されたAPIパスワード
-IPAddress=192.168.0.ZZZ ← 先ほど調べたWindowsマシンのローカルIPアドレス
-Port=80
-BaseDir=/path/to/dir/stocktrading
-```
-
-## プログラムを実行する
-
-とりあえず、```$ make``` してみましょう。うまくいけば、取引余力が表示されるはずです。
-
-## その他
-
-kabuステーションは毎日再起動する必要があることに注意しましょう。\
-APIキーは毎日リフレッシュ（更新）する必要があるのですが、kabuステーションを再起動しなければ、これができないようになっています。
-
-なぜこのクソみたいな仕様になっているのかは分かりません。
-
-
-
-
+[LICENSE](LICENSE) を参照してください。
