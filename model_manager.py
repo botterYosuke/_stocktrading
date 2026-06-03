@@ -214,6 +214,36 @@ class ModelManager:
         return df_extract
 
 
+def emit_daily_signals(df, as_of, output_dir="signals", sample_size=50):
+    """Sample up to ``sample_size`` candidates by confidence and write the
+    single-day signals JSON + 1-day manifest (B3-1).
+
+    Empty-safe and ``<sample_size``-safe: ``len(df)==0`` -> empty signals +
+    ``instruments=[]`` manifest; ``len(df)<sample_size`` -> use all candidates
+    (no ``np.random.choice`` crash). ``df`` columns: ``[date, code, pred, side]``.
+    """
+    n = min(sample_size, len(df))
+    if n > 0:
+        weights = df["pred"].to_numpy()
+        probabilities = weights / weights.sum()
+        sampled = np.random.choice(a=df.index, size=n, replace=False, p=probabilities)
+        df = df.loc[sampled]
+    df = df.sort_values("pred", ascending=False).reset_index(drop=True)
+
+    target_date = Misc.get_next_business_day(parse_date(as_of)).strftime("%Y-%m-%d")
+    rows = [
+        {"code": row["code"], "pred": float(row["pred"]), "side": int(row["side"])}
+        for _, row in df.iterrows()
+    ]
+    path = write_daily_signals(
+        output_dir=output_dir, target_date=target_date, as_of=as_of, rows=rows
+    )
+    write_manifest(
+        output_dir=output_dir, start=target_date, end=target_date, signal_files=[path]
+    )
+    return path
+
+
 if __name__ == "__main__":
     # # 土日祝日は実行しない
     # if Misc.check_day_type(datetime.date.today()):
@@ -250,35 +280,5 @@ if __name__ == "__main__":
             selected_indices.append(index)
     df = df.loc[selected_indices, :]
 
-    # 予測値に応じて確率的に銘柄を50個サンプリング
-    weights = df["pred"].to_numpy()
-    probabilities = weights / np.sum(weights)
-    sampled_indices = np.random.choice(
-        a=df.index,
-        size=50,
-        replace=False,
-        p=probabilities,
-    )
-    df = df.loc[sampled_indices, ["date", "code", "pred", "side"]]
-    df = df.sort_values("pred", ascending=False).reset_index()
-    df = df[["date", "code", "pred", "side"]]
-
-    # signals JSON として出力する（SQLite Target の置き換え, B2-4）
-    rows = [
-        {"code": row["code"], "pred": row["pred"], "side": row["side"]}
-        for _, row in df.iterrows()
-    ]
-    target_date = df["date"].iloc[0]
-
-    signal_path = write_daily_signals(
-        output_dir="signals",
-        target_date=target_date,
-        as_of=as_of,
-        rows=rows,
-    )
-    write_manifest(
-        output_dir="signals",
-        start=target_date,
-        end=target_date,
-        signal_files=[signal_path],
-    )
+    # 確率的サンプリング + signals/manifest 出力（空・<50 安全, B3-1）
+    emit_daily_signals(df, as_of)
