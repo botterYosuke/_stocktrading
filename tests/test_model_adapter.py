@@ -38,6 +38,27 @@ class ModelManagerLazyImportTests(unittest.TestCase):
         self.assertEqual(df["close"].tolist(), [105.0, 108.0])
         self.assertEqual(df["date"].tolist(), [date(2026, 1, 5), date(2026, 1, 6)])
 
+    def test_predict_empty_is_safe(self) -> None:
+        """B2 empty-guard: predict returns an empty [date,code,pred] frame (no crash)
+        when no code clears the 0.7 threshold."""
+        import numpy as np
+        import pandas as pd
+
+        import model_manager
+
+        mm = model_manager.ModelManager()
+        mm.codes = ["7203", "6758"]
+        dict_df = {c: pd.DataFrame(np.zeros((40, 5))) for c in mm.codes}
+
+        class _FakeModel:
+            def predict(self, x, verbose=0):
+                return np.array([[0.1]])  # below threshold -> zero candidates
+
+        out = mm.predict(_FakeModel(), dict_df, "2021-06-30")
+
+        self.assertEqual(list(out.columns), ["date", "code", "pred"])
+        self.assertEqual(len(out), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

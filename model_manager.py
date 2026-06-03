@@ -205,7 +205,10 @@ class ModelManager:
         df_extract = df_result[df_result["pred"] >= 0.7].copy()
 
         nbd = Misc.get_next_business_day(parse_date(as_of)).strftime("%Y-%m-%d")
-        df_extract.loc[:, "date"] = nbd
+        # Empty-safe: `.loc[:, "date"] = nbd` raises on a 0-row frame; plain
+        # column assignment yields an empty [date, code, pred] frame instead of
+        # crashing when no code clears the threshold (B2 empty-guard).
+        df_extract["date"] = nbd
         df_extract = df_extract[["date", "code", "pred"]]
 
         return df_extract
