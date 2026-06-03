@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import tempfile
 import unittest
 from datetime import date
@@ -81,6 +82,43 @@ class GeneratorTests(unittest.TestCase):
             # invalid JSON -> generate
             signals_path_for(td_path, "2021-07-02").write_text("{ broken", encoding="utf-8")
             self.assertTrue(should_generate(td_path, "2021-07-02"))
+
+    def test_aggregate_manifest_union_and_order(self) -> None:
+        from daily_generator import aggregate_manifest
+        from signals_writer import write_daily_signals
+
+        with tempfile.TemporaryDirectory() as td:
+            # create out of order; symbols overlap across days
+            write_daily_signals(output_dir=td, target_date="2021-06-08", as_of="2021-06-07",
+                                rows=[{"code": "9984", "pred": 0.8, "side": 2}])
+            write_daily_signals(output_dir=td, target_date="2021-06-04", as_of="2021-06-03",
+                                rows=[{"code": "7203", "pred": 0.8, "side": 2}])
+            write_daily_signals(output_dir=td, target_date="2021-06-07", as_of="2021-06-04",
+                                rows=[{"code": "6758", "pred": 0.8, "side": 1},
+                                      {"code": "7203", "pred": 0.75, "side": 2}])
+            mp = aggregate_manifest(td, "2021-06-04", "2021-06-08")
+            m = json.loads(Path(mp).read_text(encoding="utf-8"))
+            self.assertEqual(
+                m["files"],
+                ["signals_2021-06-04.json", "signals_2021-06-07.json", "signals_2021-06-08.json"],
+            )
+            self.assertEqual(m["instruments"], ["6758.TSE", "7203.TSE", "9984.TSE"])
+            self.assertEqual((m["start"], m["end"]), ("2021-06-04", "2021-06-08"))
+
+    def test_aggregate_manifest_skips_invalid(self) -> None:
+        from daily_generator import aggregate_manifest, signals_path_for
+        from signals_writer import write_daily_signals
+
+        with tempfile.TemporaryDirectory() as td:
+            write_daily_signals(output_dir=td, target_date="2021-06-04", as_of="2021-06-03",
+                                rows=[{"code": "7203", "pred": 0.8, "side": 2}])
+            signals_path_for(Path(td), "2021-06-07").write_text("{bad", encoding="utf-8")
+            write_daily_signals(output_dir=td, target_date="2021-06-08", as_of="2021-06-07",
+                                rows=[{"code": "9984", "pred": 0.8, "side": 2}])
+            mp = aggregate_manifest(td, "2021-06-04", "2021-06-08")
+            m = json.loads(Path(mp).read_text(encoding="utf-8"))
+            self.assertEqual(m["files"], ["signals_2021-06-04.json", "signals_2021-06-08.json"])
+            self.assertEqual(m["instruments"], ["7203.TSE", "9984.TSE"])
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ from pathlib import Path
 
 from data_source import parse_date
 from misc import Misc
-from signals_writer import is_valid_signals_file
+from signals_writer import is_valid_signals_file, write_manifest
 
 
 def enumerate_business_days(start, end) -> list[datetime.date]:
@@ -57,6 +57,32 @@ def plan_runs(start, end, out_dir=None, force=False) -> list[dict]:
             row["action"] = "generate" if should_generate(out_dir, target_date, force) else "skip"
         rows.append(row)
     return rows
+
+
+def aggregate_manifest(out_dir, start, end) -> Path:
+    """Aggregate the valid daily signals files in ``[start, end]`` into one range
+    ``manifest.json`` (B3-5): ``files`` date-ascending, ``instruments`` = union of
+    every day's signal symbols, ``start``/``end`` = first/last covered date.
+
+    Invalid/missing daily files are skipped. With no valid files the manifest is
+    written with ``files=[]`` and ``instruments=[]`` over the requested range.
+    """
+    out = Path(out_dir)
+    pairs = []
+    for d in enumerate_business_days(start, end):
+        target_date = d.isoformat()
+        path = signals_path_for(out, target_date)
+        if is_valid_signals_file(path, expected_target_date=target_date):
+            pairs.append((target_date, path))
+    pairs.sort(key=lambda x: x[0])  # date ascending
+
+    if pairs:
+        m_start, m_end = pairs[0][0], pairs[-1][0]
+    else:
+        m_start, m_end = parse_date(start).isoformat(), parse_date(end).isoformat()
+    return write_manifest(
+        output_dir=out, start=m_start, end=m_end, signal_files=[p for _, p in pairs]
+    )
 
 
 def main(argv=None) -> list[dict]:
