@@ -122,6 +122,44 @@ class Misc:
                 # 平日でなければ次の日へ
                 next_day += datetime.timedelta(days=1)
 
+    @staticmethod
+    def prev_business_day(date_input):
+        """
+        指定された日付より前の直近の営業日（土日祝日を除く平日）を返す。
+
+        入力日が休日でも「その日より前の営業日」を返す。
+        （月曜→前週金曜、祝日明けの営業日→祝日前の営業日）
+
+        Args:
+        date_input (datetime.date | datetime.datetime | str):
+        基準となる日付。
+
+        Returns:
+        datetime.date: 直近の前営業日。無効な入力の場合は ValueError。
+        """
+        try:
+            if isinstance(date_input, datetime.datetime):
+                base_date = date_input.date()
+            elif isinstance(date_input, datetime.date):
+                base_date = date_input
+            elif isinstance(date_input, str):
+                base_date = datetime.date.fromisoformat(date_input)
+            else:
+                raise ValueError("無効な日付入力タイプです。")
+        except ValueError as e:
+            raise ValueError(f"無効な日付形式です: {e}") from e
+
+        # 基準日の前日からチェックを開始
+        prev_day = base_date - datetime.timedelta(days=1)
+
+        while True:
+            is_weekday = prev_day.weekday() < 5
+            is_not_holiday = not jpholiday.is_holiday(prev_day)
+            if is_weekday and is_not_holiday:
+                return prev_day
+            else:
+                prev_day -= datetime.timedelta(days=1)
+
 
 class StripRichFormatter(Formatter):
     def format(self, record: LogRecord) -> str:
