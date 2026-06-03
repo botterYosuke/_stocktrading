@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
+import tempfile
 import unittest
 from datetime import date
+from pathlib import Path
 
 from data_source import DailyBar
 
@@ -58,6 +61,32 @@ class ModelManagerLazyImportTests(unittest.TestCase):
 
         self.assertEqual(list(out.columns), ["date", "code", "pred"])
         self.assertEqual(len(out), 0)
+
+    def test_emit_daily_signals_empty_and_small(self) -> None:
+        """B3-1: empty df -> empty signals + instruments=[]; <sample_size -> no crash."""
+        import pandas as pd
+
+        import model_manager
+
+        with tempfile.TemporaryDirectory() as td:
+            empty = pd.DataFrame(columns=["date", "code", "pred", "side"])
+            p = model_manager.emit_daily_signals(empty, "2021-06-30", output_dir=td, sample_size=50)
+            daily = json.loads(Path(p).read_text(encoding="utf-8"))
+            self.assertEqual(daily["signals"], [])
+            manifest = json.loads((Path(td) / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["instruments"], [])
+
+            small = pd.DataFrame(
+                {"date": ["2021-07-01"] * 3, "code": ["7203", "6758", "9984"],
+                 "pred": [0.9, 0.8, 0.75], "side": [2, 1, 2]}
+            )
+            p2 = model_manager.emit_daily_signals(small, "2021-06-30", output_dir=td, sample_size=50)
+            d2 = json.loads(Path(p2).read_text(encoding="utf-8"))
+            self.assertEqual(len(d2["signals"]), 3)  # <50 -> all used, no crash
+            self.assertEqual(
+                sorted(s["symbol"] for s in d2["signals"]),
+                ["6758.TSE", "7203.TSE", "9984.TSE"],
+            )
 
 
 if __name__ == "__main__":

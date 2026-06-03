@@ -108,6 +108,44 @@ def write_manifest(
     return path
 
 
+def is_valid_signals_file(path: str | Path, expected_target_date: str | date | None = None) -> bool:
+    """Strict validity check for a daily signals JSON (used by resume, B3-4).
+
+    Valid iff: file parses; ``schema_version`` matches; ``target_date``/``as_of``
+    are date strings (and ``target_date`` equals ``expected_target_date`` when
+    given); ``signals`` is a list where every item has a non-empty ``symbol``,
+    ``side`` in {LONG, SHORT}, and numeric ``confidence`` in (0, 1]. An **empty**
+    ``signals`` list is valid (a legitimate no-signal day, B3-1).
+    """
+    p = Path(path)
+    if not p.exists():
+        return False
+    try:
+        doc = json.loads(p.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    if not isinstance(doc, dict) or doc.get("schema_version") != SIGNAL_SCHEMA_VERSION:
+        return False
+    if not isinstance(doc.get("target_date"), str) or not isinstance(doc.get("as_of"), str):
+        return False
+    if expected_target_date is not None and doc["target_date"] != str(expected_target_date):
+        return False
+    signals = doc.get("signals")
+    if not isinstance(signals, list):
+        return False
+    for s in signals:
+        if not isinstance(s, dict):
+            return False
+        if not isinstance(s.get("symbol"), str) or not s["symbol"]:
+            return False
+        if s.get("side") not in ("LONG", "SHORT"):
+            return False
+        c = s.get("confidence")
+        if isinstance(c, bool) or not isinstance(c, (int, float)) or not (0 < c <= 1):
+            return False
+    return True
+
+
 def _coerce_signal(row: Mapping[str, object] | Signal) -> Signal:
     if isinstance(row, Signal):
         return row
