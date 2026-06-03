@@ -9,9 +9,11 @@ from __future__ import annotations
 
 import argparse
 import datetime
+from pathlib import Path
 
 from data_source import parse_date
 from misc import Misc
+from signals_writer import is_valid_signals_file
 
 
 def enumerate_business_days(start, end) -> list[datetime.date]:
@@ -30,12 +32,31 @@ def enumerate_business_days(start, end) -> list[datetime.date]:
     return days
 
 
-def plan_runs(start, end) -> list[dict]:
-    """Dry-run mapping: each business ``target_date`` -> ``as_of`` (prev business day)."""
-    return [
-        {"target_date": d.isoformat(), "as_of": Misc.prev_business_day(d).isoformat()}
-        for d in enumerate_business_days(start, end)
-    ]
+def signals_path_for(out_dir, target_date) -> Path:
+    return Path(out_dir) / f"signals_{target_date}.json"
+
+
+def should_generate(out_dir, target_date, force=False) -> bool:
+    """Resume decision (B3-4): (re)generate unless a *valid* signals file already
+    exists for ``target_date``. ``--force`` always regenerates."""
+    if force:
+        return True
+    return not is_valid_signals_file(
+        signals_path_for(out_dir, target_date), expected_target_date=target_date
+    )
+
+
+def plan_runs(start, end, out_dir=None, force=False) -> list[dict]:
+    """Each business ``target_date`` -> ``as_of`` (prev business day). When
+    ``out_dir`` is given, also tag a resume ``action`` of ``generate``/``skip``."""
+    rows = []
+    for d in enumerate_business_days(start, end):
+        target_date = d.isoformat()
+        row = {"target_date": target_date, "as_of": Misc.prev_business_day(d).isoformat()}
+        if out_dir is not None:
+            row["action"] = "generate" if should_generate(out_dir, target_date, force) else "skip"
+        rows.append(row)
+    return rows
 
 
 def main(argv=None) -> list[dict]:
@@ -48,17 +69,22 @@ def main(argv=None) -> list[dict]:
     parser.add_argument("--end", required=True, help="range end (YYYY-MM-DD), inclusive")
     parser.add_argument("--out", default="signals", help="output dir (used once the loop is wired)")
     parser.add_argument(
+        "--force",
+        action="store_true",
+        help="regenerate even when a valid signals file already exists (B3-4)",
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="print the plan only (the B3-2 skeleton always dry-runs)",
+        help="print the plan only (the skeleton always dry-runs)",
     )
     args = parser.parse_args(argv)
 
-    plan = plan_runs(args.start, args.end)
+    plan = plan_runs(args.start, args.end, out_dir=args.out, force=args.force)
     for row in plan:
-        print(f"{row['target_date']} <- as_of {row['as_of']}")
+        print(f"{row['target_date']} <- as_of {row['as_of']} [{row['action']}]")
     # NOTE: signal generation (prepare_data/fit/predict/emit_daily_signals) and
-    # model cache / resume are wired in B3-3+. args.out is reserved for that.
+    # model cache reuse are wired in the final loop step. args.out drives resume.
     return plan
 
 

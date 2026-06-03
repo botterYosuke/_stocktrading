@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import tempfile
 import unittest
 from datetime import date
+from pathlib import Path
 
 # daily_generator -> misc -> config_manager pulls jpholiday/yaml/dotenv (the
 # calendar stack). Absent in the stdlib-only tooling env, so these self-skip
@@ -49,15 +51,36 @@ class GeneratorTests(unittest.TestCase):
     def test_cli_dry_run_mapping(self) -> None:
         from daily_generator import main
 
-        plan = main(["--start", "2021-06-04", "--end", "2021-06-08", "--dry-run"])
+        with tempfile.TemporaryDirectory() as td:  # empty out -> all "generate"
+            plan = main(["--start", "2021-06-04", "--end", "2021-06-08", "--out", td, "--dry-run"])
         self.assertEqual(
             plan,
             [
-                {"target_date": "2021-06-04", "as_of": "2021-06-03"},
-                {"target_date": "2021-06-07", "as_of": "2021-06-04"},
-                {"target_date": "2021-06-08", "as_of": "2021-06-07"},
+                {"target_date": "2021-06-04", "as_of": "2021-06-03", "action": "generate"},
+                {"target_date": "2021-06-07", "as_of": "2021-06-04", "action": "generate"},
+                {"target_date": "2021-06-08", "as_of": "2021-06-07", "action": "generate"},
             ],
         )
+
+    def test_should_generate_resume(self) -> None:
+        from daily_generator import should_generate, signals_path_for
+        from signals_writer import write_daily_signals
+
+        with tempfile.TemporaryDirectory() as td:
+            td_path = Path(td)
+            # missing -> generate
+            self.assertTrue(should_generate(td_path, "2021-07-01"))
+            # valid existing -> skip
+            write_daily_signals(
+                output_dir=td_path, target_date="2021-07-01", as_of="2021-06-30",
+                rows=[{"code": "7203", "pred": 0.83, "side": 2}],
+            )
+            self.assertFalse(should_generate(td_path, "2021-07-01"))
+            # --force -> regenerate even if valid
+            self.assertTrue(should_generate(td_path, "2021-07-01", force=True))
+            # invalid JSON -> generate
+            signals_path_for(td_path, "2021-07-02").write_text("{ broken", encoding="utf-8")
+            self.assertTrue(should_generate(td_path, "2021-07-02"))
 
 
 if __name__ == "__main__":
