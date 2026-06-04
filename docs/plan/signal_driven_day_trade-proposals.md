@@ -51,7 +51,11 @@ run_dir: `C:\Users\sasai\AppData\Roaming\flowsurface\run-buffer\1780554977-signa
 wiki: `_sacrificial-lamb/wiki/runs/signal_driven_day_trade_smoke-1780554977.md`
 
 **次のステップ (優先順)**:
-- [ ] 1. 2643.TSE 除外 replay → 集中度感度確認
+- [x] 1. 2643.TSE 除外 replay → 集中度感度確認 **PASS**
+  - no2643 total_pnl = +159,904 JPY (baseline と 1円も変わらず)
+  - proxy PnL (+290K) は notional flow であり PnL 帰属ではなかった
+  - 2643.TSE の真の PnL 寄与 ≈ 0 JPY、PnL は 189 銘柄に分散
+  - run_id: 1780566808-signal_driven_day_trade_no2643-1306_TSE
 - [ ] 2. 広い IS window (2025-01-14〜2025-03-31) → signals 再生成 + catalog 期間拡張
 - [ ] 3. 日別 PnL と symbol contribution の安定性確認
 - [ ] 4. SHORT basket の market/sector 偏り確認
