@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "key": "e49d298d9bd28af0",
+  "as_of": "2025-01-16",
+  "train_window_business_days": 80,
+  "universe_hash": "efaa395aba71644b4d07dd0a32ecb5c7c552333f",
+  "universe_count": 4195,
+  "model_params": {
+    "window": 30,
+    "epochs": 30,
+    "batch_size": 128,
+    "layer": "lstm",
+    "threshold": 0.7,
+    "per_up": 1.005,
+    "per_down": 0.995
+  },
+  "artifacts": {
+    "up": "up.keras",
+    "down": "down.keras"
+  }
+}
