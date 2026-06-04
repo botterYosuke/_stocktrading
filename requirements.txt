@@ -9,3 +9,7 @@ python-dotenv
 jpholiday
 rich
 ruff
+lightgbm
+numba
+scipy
+ta
