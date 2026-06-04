@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "target_date": "2025-01-15",
+  "as_of": "2025-01-14",
+  "source": "stocktrading.model_manager",
+  "generated_at": "2026-06-04T01:46:25+00:00",
+  "regulation_filter": {
+    "brain": "disabled",
+    "replay": "not_available",
+    "live": "pre_trade_check"
+  },
+  "signals": [
+    {
+      "symbol": "9903.TSE",
+      "side": "SHORT",
+      "confidence": 0.9701179265975952,
+      "code": "9903"
+    },
+    {
+      "symbol": "1429.TSE",
+      "side": "LONG",
+      "confidence": 0.9535007476806641,
+      "code": "1429"
+    },
+    {
+      "symbol": "9236.TSE",
+      "side": "SHORT",
+      "confidence": 0.9533806443214417,
+      "code": "9236"
+    },
+    {
+      "symbol": "9902.TSE",
+      "side": "LONG",
+      "confidence": 0.9397445917129517,
+      "code": "9902"
+    },
+    {
+      "symbol": "9605.TSE",
+      "side": "LONG",
+      "confidence": 0.9313170909881592,
+      "code": "9605"
+    },
+    {
+      "symbol": "4676.TSE",
+      "side": "LONG",
+      "confidence": 0.9059096574783325,
+      "code": "4676"
+    },
+    {
+      "symbol": "6859.TSE",
+      "side": "LONG",
+      "confidence": 0.891343891620636,
+      "code": "6859"
+    },
+    {
+      "symbol": "6524.TSE",
+      "side": "LONG",
+      "confidence": 0.8826534748077393,
+      "code": "6524"
+    },
+    {
+      "symbol": "9932.TSE",
+      "side": "LONG",
+      "confidence": 0.879946768283844,
+      "code": "9932"
+    },
+    {
+      "symbol": "9790.TSE",
+      "side": "LONG",
+      "confidence": 0.872104823589325,
+      "code": "9790"
+    },
+    {
+      "symbol": "4267.TSE",
+      "side": "SHORT",
+      "confidence": 0.8673733472824097,
+      "code": "4267"
+    },
+    {
+      "symbol": "6571.TSE",
+      "side": "SHORT",
+      "confidence": 0.8658689260482788,
+      "code": "6571"
+    },
+    {
+      "symbol": "2038.TSE",
+      "side": "SHORT",
+      "confidence": 0.860200047492981,
+      "code": "2038"
+    },
+    {
+      "symbol": "4220.TSE",
+      "side": "SHORT",
+      "confidence": 0.8423261642456055,
+      "code": "4220"
+    },
+    {
+      "symbol": "6919.TSE",
+      "side": "SHORT",
+      "confidence": 0.8421011567115784,
+      "code": "6919"
+    },
+    {
+      "symbol": "6333.TSE",
+      "side": "LONG",
+      "confidence": 0.8404293060302734,
+      "code": "6333"
+    },
+    {
+      "symbol": "3675.TSE",
+      "side": "SHORT",
+      "confidence": 0.8397263288497925,
+      "code": "3675"
+    },
+    {
+      "symbol": "6136.TSE",
+      "side": "LONG",
+      "confidence": 0.836405336856842,
+      "code": "6136"
+    },
+    {
+      "symbol": "9679.TSE",
+      "side": "SHORT",
+      "confidence": 0.8361293077468872,
+      "code": "9679"
+    },
+    {
+      "symbol": "6033.TSE",
+      "side": "SHORT",
+      "confidence": 0.8302466869354248,
+      "code": "6033"
+    },
+    {
+      "symbol": "1306.TSE",
+      "side": "SHORT",
+      "confidence": 0.8300977349281311,
+      "code": "1306"
+    },
+    {
+      "symbol": "9936.TSE",
+      "side": "SHORT",
+      "confidence": 0.827960729598999,
+      "code": "9936"
+    },
+    {
+      "symbol": "6178.TSE",
+      "side": "SHORT",
+      "confidence": 0.8274254202842712,
+      "code": "6178"
+    },
+    {
+      "symbol": "9008.TSE",
+      "side": "SHORT",
+      "confidence": 0.8268823623657227,
+      "code": "9008"
+    },
+    {
+      "symbol": "1948.TSE",
+      "side": "SHORT",
+      "confidence": 0.8171886205673218,
+      "code": "1948"
+    },
+    {
+      "symbol": "2487.TSE",
+      "side": "LONG",
+      "confidence": 0.8123729228973389,
+      "code": "2487"
+    },
+    {
+      "symbol": "9064.TSE",
+      "side": "SHORT",
+      "confidence": 0.8120410442352295,
+      "code": "9064"
+    },
+    {
+      "symbol": "9142.TSE",
+      "side": "LONG",
+      "confidence": 0.8058147430419922,
+      "code": "9142"
+    },
+    {
+      "symbol": "4345.TSE",
+      "side": "SHORT",
+      "confidence": 0.8042389154434204,
+      "code": "4345"
+    },
+    {
+      "symbol": "1961.TSE",
+      "side": "SHORT",
+      "confidence": 0.8006957769393921,
+      "code": "1961"
+    },
+    {
+      "symbol": "2792.TSE",
+      "side": "SHORT",
+      "confidence": 0.8003763556480408,
+      "code": "2792"
+    },
+    {
+      "symbol": "2628.TSE",
+      "side": "LONG",
+      "confidence": 0.7957773208618164,
+      "code": "2628"
+    },
+    {
+      "symbol": "6324.TSE",
+      "side": "SHORT",
+      "confidence": 0.7910891175270081,
+      "code": "6324"
+    },
+    {
+      "symbol": "4536.TSE",
+      "side": "SHORT",
+      "confidence": 0.790747880935669,
+      "code": "4536"
+    },
+    {
+      "symbol": "4923.TSE",
+      "side": "LONG",
+      "confidence": 0.7732161283493042,
+      "code": "4923"
+    },
+    {
+      "symbol": "5535.TSE",
+      "side": "SHORT",
+      "confidence": 0.7718017101287842,
+      "code": "5535"
+    },
+    {
+      "symbol": "2784.TSE",
+      "side": "SHORT",
+      "confidence": 0.7711893916130066,
+      "code": "2784"
+    },
+    {
+      "symbol": "8076.TSE",
+      "side": "SHORT",
+      "confidence": 0.760469377040863,
+      "code": "8076"
+    },
+    {
+      "symbol": "6407.TSE",
+      "side": "LONG",
+      "confidence": 0.7573895454406738,
+      "code": "6407"
+    },
+    {
+      "symbol": "3771.TSE",
+      "side": "SHORT",
+      "confidence": 0.7463762164115906,
+      "code": "3771"
+    },
+    {
+      "symbol": "2325.TSE",
+      "side": "SHORT",
+      "confidence": 0.7407767176628113,
+      "code": "2325"
+    },
+    {
+      "symbol": "1952.TSE",
+      "side": "SHORT",
+      "confidence": 0.7405974864959717,
+      "code": "1952"
+    },
+    {
+      "symbol": "5659.TSE",
+      "side": "SHORT",
+      "confidence": 0.7404806613922119,
+      "code": "5659"
+    },
+    {
+      "symbol": "2252.TSE",
+      "side": "SHORT",
+      "confidence": 0.7389832735061646,
+      "code": "2252"
+    },
+    {
+      "symbol": "3691.TSE",
+      "side": "SHORT",
+      "confidence": 0.7386791706085205,
+      "code": "3691"
+    },
+    {
+      "symbol": "3201.TSE",
+      "side": "SHORT",
+      "confidence": 0.734675407409668,
+      "code": "3201"
+    },
+    {
+      "symbol": "7085.TSE",
+      "side": "LONG",
+      "confidence": 0.7211593389511108,
+      "code": "7085"
+    },
+    {
+      "symbol": "2848.TSE",
+      "side": "SHORT",
+      "confidence": 0.7208994626998901,
+      "code": "2848"
+    },
+    {
+      "symbol": "6614.TSE",
+      "side": "LONG",
+      "confidence": 0.7056915760040283,
+      "code": "6614"
+    },
+    {
+      "symbol": "2469.TSE",
+      "side": "SHORT",
+      "confidence": 0.7014986872673035,
+      "code": "2469"
+    }
+  ]
+}
