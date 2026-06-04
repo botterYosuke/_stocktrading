@@ -12,4 +12,4 @@ ruff
 lightgbm
 numba
 scipy
-ta
+TA-Lib

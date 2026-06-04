@@ -6,7 +6,48 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from universe import select_universe
+from datetime import date
+
+from universe import _daily_file_after_cutoff, select_universe
+
+
+class DailyFileFilterTests(unittest.TestCase):
+    """Perf prune (handoff §5a): skip daily files entirely after the PIT cutoff."""
+
+    def test_month_token_after_cutoff_is_skipped(self) -> None:
+        cutoff = date(2024, 1, 31)
+        self.assertTrue(_daily_file_after_cutoff(Path("equities_bars_daily_202402.csv.gz"), cutoff))
+        self.assertFalse(_daily_file_after_cutoff(Path("equities_bars_daily_202401.csv.gz"), cutoff))
+        self.assertFalse(_daily_file_after_cutoff(Path("equities_bars_daily_202312.csv.gz"), cutoff))
+
+    def test_day_token_boundary(self) -> None:
+        cutoff = date(2024, 1, 31)
+        self.assertTrue(_daily_file_after_cutoff(Path("equities_bars_daily_20240201.csv.gz"), cutoff))
+        self.assertFalse(_daily_file_after_cutoff(Path("equities_bars_daily_20240131.csv.gz"), cutoff))
+
+    def test_unrecognised_name_never_skipped(self) -> None:
+        self.assertFalse(_daily_file_after_cutoff(Path("download_daily_bars.ps1"), date(2024, 1, 31)))
+
+
+class FutureFileDoesNotAffectSelectionTests(unittest.TestCase):
+    def test_future_month_file_is_ignored(self) -> None:
+        """A future-month file (skipped by the filter) must not change results."""
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            base = UniverseTests()  # reuse row/series/write helpers
+            rows = base._series("77770", days=5, close=1000, va=100000)
+            rows += base._series("88880", days=5, close=1000, va=300000)
+            base._write_daily(root / "equities_bars_daily_202401.csv.gz", rows)
+            # A later month with a giant-Va row for 7777 that must be ignored.
+            base._write_daily(
+                root / "equities_bars_daily_202402.csv.gz",
+                [base._row("2024-02-05", "77770", 1000, 99999999)],
+            )
+            sel = select_universe(
+                as_of="2024-01-31", top_n=10, price_band=(700.0, 6000.0),
+                va_window=5, cache_dir=root,
+            )
+            self.assertEqual(sel, ["8888", "7777"])
 
 
 class UniverseTests(unittest.TestCase):
