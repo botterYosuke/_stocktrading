@@ -176,3 +176,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Large data panels (regenerated locally, do not commit)
+data/*.parquet
