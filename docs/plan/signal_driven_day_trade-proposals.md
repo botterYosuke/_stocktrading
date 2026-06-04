@@ -41,10 +41,20 @@ run_dir: `C:\Users\sasai\AppData\Roaming\flowsurface\run-buffer\1780554977-signa
 
 **Phase IS-0: Completed (2026-06-04)**
 
-**次のステップ**:
-- [ ] ingest → Silver breakdown (オプション)
-- [ ] より広い IS window (例: 2025-01-14〜2025-03-31) で replay — signals 再生成が必要
-- [ ] OOS window の設計と pre-register (IS baseline 確立のため次フェーズ設計待ち)
+**Silver Breakdown 結果 (2026-06-04)**:
+- pipeline: **PASS**
+- IS baseline: **PASS** as initial evidence
+- signal edge: **PROVISIONAL** — 集中度依存、再現性チェック必要
+- 2643.TSE 単独 +290K JPY (proxy) → top 2 銘柄で engine PnL の ~2.7x
+- SHORT 主体 84%、confidence mean 0.813、190/192 銘柄で約定、全ポジション決済
+
+wiki: `_sacrificial-lamb/wiki/runs/signal_driven_day_trade_smoke-1780554977.md`
+
+**次のステップ (優先順)**:
+- [ ] 1. 2643.TSE 除外 replay → 集中度感度確認
+- [ ] 2. 広い IS window (2025-01-14〜2025-03-31) → signals 再生成 + catalog 期間拡張
+- [ ] 3. 日別 PnL と symbol contribution の安定性確認
+- [ ] 4. SHORT basket の market/sector 偏り確認
 
 **参照**:
 - task doc: `docs/task/signal_driven_day_trade-phase-IS0-catalog-extend-task.md`
