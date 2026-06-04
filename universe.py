@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import gzip
+import re
 import statistics
 from datetime import date
 from pathlib import Path
@@ -14,6 +15,29 @@ from data_source import (
     normalize_code,
     parse_date,
 )
+
+
+_DAILY_TOKEN_RE = re.compile(r"equities_bars_daily_(\d{6}|\d{8})\.csv\.gz$")
+
+
+def _daily_file_after_cutoff(path: Path, cutoff: date) -> bool:
+    """Whether a daily file's date token begins strictly after ``cutoff``.
+
+    Daily files carry a 6-digit month token (``equities_bars_daily_YYYYMM``) or
+    an 8-digit day token. A file whose earliest possible day is after the PIT
+    cutoff contains only rows the row-level filter already drops, so it can be
+    skipped unread — the dominant cost when the cache spans years past the
+    build's ``as_of`` (handoff §5a). Unrecognised names are never skipped.
+    """
+    m = _DAILY_TOKEN_RE.search(path.name)
+    if m is None:
+        return False
+    token = m.group(1)
+    if len(token) == 6:
+        first = date(int(token[:4]), int(token[4:6]), 1)
+    else:
+        first = date(int(token[:4]), int(token[4:6]), int(token[6:8]))
+    return first > cutoff
 
 
 def _load_daily_bars_pit(
@@ -33,6 +57,8 @@ def _load_daily_bars_pit(
     bars_by_code: dict[str, list[DailyBar]] = {}
 
     for path in iter_daily_bar_files(cache_dir):
+        if _daily_file_after_cutoff(path, cutoff):
+            continue  # entirely after PIT cutoff -> no surviving rows
         with gzip.open(path, "rt", encoding="utf-8", newline="") as fh:
             reader = csv.DictReader(fh)
             for row in reader:

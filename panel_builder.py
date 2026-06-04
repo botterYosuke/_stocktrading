@@ -15,6 +15,8 @@ wires universe + load + resample around it (needs S:/j-quants, not unit-tested).
 """
 from __future__ import annotations
 
+import os
+
 import pandas as pd
 
 from features_intraday import FEATURES, calc_features
@@ -96,17 +98,30 @@ def build_panel(
     cache_dir=None,
     min_bars: int = 64,
     dropna: bool = True,
+    panel_cache: str | None = None,
     **label_kwargs,
 ) -> pd.DataFrame:
     """End-to-end: select universe (PIT at ``universe_as_of``, default ``end``),
     load month-filtered minute bars over ``[start, end]``, resample to 15-min,
-    and assemble the cross-sectional panel."""
+    and assemble the cross-sectional panel.
+
+    ``panel_cache`` (optional parquet path) turns the slow decompress+featurize
+    into a one-time cost: if the file exists it is loaded and returned verbatim;
+    otherwise the panel is built and written there. The caller owns the key —
+    use a distinct path per ``(start, end, top_n, as_of, label_kwargs)`` (handoff
+    §5b). Requires ``pyarrow``/``fastparquet`` only when ``panel_cache`` is set."""
+    if panel_cache is not None and os.path.exists(panel_cache):
+        return pd.read_parquet(panel_cache)
+
     as_of = universe_as_of if universe_as_of is not None else end
     codes = select_universe(as_of=as_of, top_n=top_n, cache_dir=cache_dir)
     bars_by_code = load_minute_bars(
         cache_dir=cache_dir, start=start, end=end, codes=codes
     )
     panel_by_code = resample_15min(bars_by_code)
-    return assemble_panel(
+    panel = assemble_panel(
         panel_by_code, cost_model, min_bars=min_bars, dropna=dropna, **label_kwargs
     )
+    if panel_cache is not None:
+        panel.to_parquet(panel_cache, index=False)
+    return panel

@@ -110,5 +110,34 @@ class AssemblePanelTests(unittest.TestCase):
             self.assertIn(col, panel.columns)
 
 
+try:
+    import pyarrow  # noqa: F401
+
+    _PARQUET = _DEPS
+except Exception:  # pragma: no cover
+    _PARQUET = False
+
+
+@unittest.skipUnless(_PARQUET, "requires pandas/pyarrow")
+class PanelCacheTests(unittest.TestCase):
+    def test_cache_hit_returns_parquet_without_building(self) -> None:
+        """If the parquet cache exists, build_panel returns it verbatim and does
+        not touch the data layer (passes a bogus cache_dir to prove no I/O)."""
+        import tempfile
+        from pathlib import Path
+
+        from panel_builder import build_panel
+
+        cached = pd.DataFrame({"code": ["7203"], "timestamp": [0], "y_buy": [0.01]})
+        with tempfile.TemporaryDirectory() as td:
+            path = str(Path(td) / "panel.parquet")
+            cached.to_parquet(path, index=False)
+            out = build_panel(
+                start="2024-01-01", end="2024-01-31", cost_model=_zero_cost(),
+                cache_dir="/nonexistent/should/not/be/read", panel_cache=path,
+            )
+        pd.testing.assert_frame_equal(out, cached)
+
+
 if __name__ == "__main__":
     unittest.main()
