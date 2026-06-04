@@ -52,6 +52,22 @@ def train_models(panel: pd.DataFrame, *, params: dict | None = None):
     return model_buy, model_sell
 
 
+def predict_with(models, panel: pd.DataFrame) -> pd.DataFrame:
+    """Apply already-fitted ``(model_buy, model_sell)`` to ``panel``.
+
+    Adds ``y_pred_buy`` / ``y_pred_sell`` to a copy. This is the 1-shot held-out
+    path: fit once on the dev window with ``train_models``, then apply ONCE here
+    to the frozen held-out window (pre-registration #5). Features are shared
+    verbatim via ``FEATURES`` so train and inference cannot drift.
+    """
+    model_buy, model_sell = models
+    X = panel[FEATURES].to_numpy(dtype="float64")
+    out = panel.copy()
+    out["y_pred_buy"] = model_buy.predict(X)
+    out["y_pred_sell"] = model_sell.predict(X)
+    return out
+
+
 def make_splitter(kind: str = "grouped", *, n_splits: int = 5):
     """Return a ``(kind, sklearn-splitter)`` pair.
 

@@ -121,6 +121,16 @@ class OosPredictTests(unittest.TestCase):
         # TimeSeriesSplit never predicts the earliest block -> some NaN.
         self.assertTrue(out["y_pred_buy"].isna().any())
 
+    def test_predict_with_applies_fitted_models_once(self) -> None:
+        from model_lgbm import predict_with, train_models
+
+        dev = _synthetic_panel(seed=1)
+        held = _synthetic_panel(seed=2)
+        out = predict_with(train_models(dev), held)
+        self.assertEqual(len(out), len(held))
+        self.assertFalse(out["y_pred_buy"].isna().any())
+        self.assertFalse(out["y_pred_sell"].isna().any())
+
     def test_train_models_returns_two_fitted_regressors(self) -> None:
         from model_lgbm import train_models
 
