@@ -41,6 +41,42 @@ class DataSourceTests(unittest.TestCase):
             self.assertEqual(bars["7203"][0].close, 108.0)
             self.assertEqual(newest_close_as_of(bars, "72030", "2026-01-06"), 108.0)
 
+    def test_load_daily_bars_skips_rows_with_empty_ohlc(self) -> None:
+        """Regression: empty O/H/L/C cells must be skipped, not crash (ValueError).
+
+        Va/AdjFactor were already empty-safe via _optional_float, but O/H/L/C used
+        bare float(row[...]) -> ValueError on the 644-symbol / 23k-row empty-OHLC
+        data window. load_daily_bars must drop such rows and return only healthy ones.
+        """
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            self._write_daily(
+                root / "equities_bars_daily_202601.csv.gz",
+                [
+                    # healthy row
+                    ["2026-01-05", "72030", "100", "110", "90", "105", "", "", "1000", "100000", "1"],
+                    # empty OHLC row (same code, different date) -> must be skipped
+                    ["2026-01-06", "72030", "", "", "", "", "", "", "", "", "1"],
+                    # healthy row for a different code
+                    ["2026-01-05", "67580", "200", "210", "190", "205", "", "", "3000", "600000", "1"],
+                ],
+            )
+
+            # (i) must NOT raise
+            bars = load_daily_bars(cache_dir=root, start="2026-01-05", end="2026-01-06")
+
+            # (ii) healthy codes are returned
+            self.assertEqual(sorted(bars), ["6758", "7203"])
+            # healthy 7203 row survives; its empty-OHLC date is gone
+            self.assertEqual(len(bars["7203"]), 1)
+            self.assertEqual(bars["7203"][0].date, date(2026, 1, 5))
+            self.assertEqual(bars["7203"][0].close, 105.0)
+            # (iii) the empty-OHLC (code, date) is excluded
+            self.assertFalse(any(b.date == date(2026, 1, 6) for b in bars["7203"]))
+            # the other healthy code is intact
+            self.assertEqual(len(bars["6758"]), 1)
+            self.assertEqual(bars["6758"][0].close, 205.0)
+
     def test_code_to_symbol_normalizes_five_digit_jquants_code(self) -> None:
         self.assertEqual(code_to_symbol("13060"), "1306.TSE")
 

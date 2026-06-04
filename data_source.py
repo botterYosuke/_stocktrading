@@ -94,19 +94,24 @@ def load_daily_bars(
                 if code_filter is not None and code not in code_filter:
                     continue
 
+                ohlcv = _parse_ohlcv(row)
+                if ohlcv is None:
+                    continue
+
                 key = (code, row_date)
                 if key in seen:
                     continue
                 seen.add(key)
 
+                open_, high, low, close, volume = ohlcv
                 bar = DailyBar(
                     date=row_date,
                     code=code,
-                    open=float(row["O"]),
-                    high=float(row["H"]),
-                    low=float(row["L"]),
-                    close=float(row["C"]),
-                    volume=int(float(row["Vo"])),
+                    open=open_,
+                    high=high,
+                    low=low,
+                    close=close,
+                    volume=volume,
                     value=_optional_float(row.get("Va")),
                     adj_factor=_optional_float(row.get("AdjFactor")),
                 )
@@ -159,3 +164,17 @@ def _optional_float(value: str | None) -> float | None:
     if value is None or value == "":
         return None
     return float(value)
+
+
+def _parse_ohlcv(row: dict) -> tuple[float, float, float, float, int] | None:
+    """Parse O/H/L/C/Vo; return None if any is empty or non-numeric."""
+    try:
+        return (
+            float(row["O"]),
+            float(row["H"]),
+            float(row["L"]),
+            float(row["C"]),
+            int(float(row["Vo"])),
+        )
+    except (TypeError, ValueError):
+        return None
