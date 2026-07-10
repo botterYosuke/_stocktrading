@@ -1,0 +1,23 @@
+{
+  "skill_name": "strategy-optimizer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Silver/runs の中で一番 PnL が高いランはどれ？比較テーブルを見せて。",
+      "expected_output": "compare_runs.py を使って Silver/runs を横断比較し、total_pnl でソートしたランキングテーブルを表示する。ベスト run_id と主要指標（pnl, drawdown, win_rate, trades）を明示する。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "mean_reversion_01 の window を 5,10,20 と k を 1.0,2.0 で合計 6 パターンのパラメータスイープを実行して、最も total_pnl が高い設定を見つけて W&B に登録してください。",
+      "expected_output": "sweep_runner.py を e-station ルートで実行する方法を示し、スイープ後に compare_runs.py で比較してベスト run_id を特定し、publish_run.py → ingest_run.py の順で登録するまでの一連の手順を案内する。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "既存の mean_reversion_01 スイープ結果を見ると、どのパラメータが PnL に一番影響してる？ win_rate と max_drawdown も考慮して採用すべき設定を教えて。",
+      "expected_output": "compare_runs.py で既存 Silver 結果を集計し、パラメータ感度分析を行う（window vs k の影響を読み取る）。採用判断基準（pnl > baseline, drawdown 許容範囲, trade_count >= 5）に照らして最適設定を提示する。",
+      "files": []
+    }
+  ]
+}
