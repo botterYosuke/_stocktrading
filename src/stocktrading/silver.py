@@ -7,10 +7,7 @@ from pathlib import Path
 import duckdb
 
 from .config import Settings
-
-def _sql_str(value: str) -> str:
-    """Quote a value as a SQL string literal (single-quote escaped)."""
-    return "'" + value.replace("'", "''") + "'"
+from .sql import sql_str as _sql_str
 
 
 def _silver_select(glob: str, session_open: str, session_close: str) -> str:
@@ -76,7 +73,7 @@ def build_silver(settings: Settings, trade_date: date) -> SilverBuild:
     try:
         rows = con.execute(f"SELECT count(*) FROM ({select}) t").fetchone()[0]
         con.execute(
-            f"COPY ({select}) TO '{target_dir.as_posix()}' "
+            f"COPY ({select}) TO {_sql_str(target_dir.as_posix())} "
             "(FORMAT PARQUET, PARTITION_BY (code), OVERWRITE_OR_IGNORE)"
         )
     finally:
