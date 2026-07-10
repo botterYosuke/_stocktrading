@@ -1,0 +1,29 @@
+[project]
+name = "stocktrading"
+version = "0.1.0"
+description = "Day-trading strategy workspace backed by Backcast infrastructure and medallion order-book data."
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "duckdb>=1.5",
+    "orjson>=3.11.9",
+    "pydantic>=2.13.4",
+    "python-dotenv>=1.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/stocktrading"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "--strict-markers"
