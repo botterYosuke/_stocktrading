@@ -10,11 +10,28 @@ from .config import Settings
 from .sql import sql_str as _sql_str
 
 
+N_LEVELS = 10  # bronze carries the full 10-level book; silver passes it through
+
+
+def _level_columns() -> str:
+    """Levels 2..N verbatim; level 1 keeps its legacy aliases above."""
+    lines = []
+    for level in range(2, N_LEVELS + 1):
+        for side in ("bid", "ask"):
+            lines.append(f"    {side}_px_{level},")
+            lines.append(f"    {side}_qty_{level},")
+    return "\n".join(lines)
+
+
 def _silver_select(glob: str, session_open: str, session_close: str) -> str:
-    """Normalize the raw board snapshot into an analysis-friendly L1 view.
+    """Normalize the raw board snapshot into an analysis-friendly view.
 
     Interpretation lives here (mid / spread / imbalance), not in bronze. Values
     are inlined because DuckDB cannot prepare parameters inside CREATE/COPY.
+
+    Besides the legacy L1 columns the maker simulator needs the full 10-level
+    book, the quote-condition signs (0101 = continuous trading; 0107 special
+    quote / itayose; 0120 halted) and the auction market-order quantities.
     """
     return f"""
 SELECT
@@ -29,6 +46,13 @@ SELECT
     CASE WHEN (bid_qty_1 + ask_qty_1) > 0
          THEN (bid_qty_1 - ask_qty_1)::DOUBLE / (bid_qty_1 + ask_qty_1)
     END                                        AS imbalance,
+{_level_columns()}
+    bid_sign,
+    ask_sign,
+    mo_buy_qty,
+    mo_sell_qty,
+    under_qty,
+    over_qty,
     last_px,
     volume,
     turnover,

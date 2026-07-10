@@ -16,11 +16,23 @@ from .backtest import (
 )
 from .bronze import export_to_bronze
 from .config import Settings, load_settings
+from .maker import (
+    MakerCostParams,
+    MakerResult,
+    MakerSession,
+    load_maker_snaps,
+    prepare_maker,
+    run_maker,
+)
+from .maker_strategies import BenchmarkJoin, ImbalanceMaker, ImbalanceMakerParams
 from .medallion import ensure_medallion_dirs
 from .signals import BASELINE, CHURN_CONTROLLED, SignalParams
 from .silver import build_all_silver, build_silver
 
 DEFAULT_SWEEP_SYMBOLS = "9984,285A,5803"
+# Maker dev set spans the spread regimes (wide >= 8bps, mid 3-8, narrow < 3);
+# the taker trio is all-narrow and structurally hostile to passive strategies.
+DEFAULT_MAKER_SYMBOLS = "6834,3110,6269,4062,285A,9984"
 DEFAULT_COST = CostParams()
 
 
@@ -320,6 +332,232 @@ def sweep_cmd(args: argparse.Namespace) -> int:
     return 0
 
 
+def _maker_cost_params(args: argparse.Namespace) -> MakerCostParams:
+    return MakerCostParams(
+        maker_commission_bps=args.maker_bps,
+        taker_commission_bps=args.taker_bps,
+        latency_secs=args.latency_secs,
+        attribution=args.attribution,
+    )
+
+
+def _print_maker_result(result: MakerResult, cost: MakerCostParams) -> None:
+    d = result.decomposition
+    session_secs = result.time_in_market_secs or 1.0
+    print(f"sessions         {result.n_sessions}  ({result.n_snaps:,} snaps)")
+    print(
+        f"orders           posted {result.posted_shares:,} sh, "
+        f"maker fills {result.fills_maker:,} ({result.filled_maker_shares:,} sh), "
+        f"taker fills {result.fills_taker:,} ({result.filled_taker_shares:,} sh)"
+    )
+    print(
+        f"fill rate        {result.fill_rate:.1%}   "
+        f"missed {result.missed_orders:,} order(s) / {result.missed_shares:,} sh"
+    )
+    print(
+        f"round trips      {result.round_trips:,}   avg hold {result.avg_hold_secs:,.1f}s   "
+        f"avg |inventory| {result.inventory_share_secs / session_secs:,.0f} sh while in market"
+    )
+    print(f"turnover         {result.turnover_yen:,.0f} JPY")
+    print(f"gross PnL        {result.cash:,.0f} JPY")
+    print(f"commission       {result.commission:,.0f} JPY  (maker {cost.maker_commission_bps}bps / taker {cost.taker_commission_bps}bps per side)")
+    print(f"net PnL          {result.net:,.0f} JPY   net/trip {result.net_per_trip:,.2f} JPY")
+    print(f"max drawdown     {result.max_drawdown:,.0f} JPY (worst session)")
+    print(f"breakeven comm   {result.breakeven_bps_per_side:,.3f} bps/side")
+    print("decomposition (sums exactly to net):")
+    print(f"  spread capture   {d.spread_capture:>12,.0f} JPY")
+    print(f"  taker edge       {d.taker_edge:>12,.0f} JPY")
+    print(f"  adverse (<=H)    {d.adverse_selection:>12,.0f} JPY")
+    print(f"  inventory drift  {d.inventory_drift:>12,.0f} JPY")
+    print(f"  commission maker {-d.commission_maker:>12,.0f} JPY")
+    print(f"  commission taker {-d.commission_taker:>12,.0f} JPY")
+
+
+def _imbalance_factory(params: ImbalanceMakerParams, latency: float):
+    """Per-session factory: tick_size is a session fact, not a run constant."""
+
+    def build(session: MakerSession) -> ImbalanceMaker:
+        return ImbalanceMaker(params, tick_size=session.tick_size, latency_secs=latency)
+
+    return build
+
+
+def _maker_strategy(args: argparse.Namespace, latency: float):
+    if args.strategy == "benchmark":
+        return BenchmarkJoin(
+            qty=args.qty, max_hold_secs=args.max_hold_secs, latency_secs=latency
+        )
+    params = ImbalanceMakerParams(
+        signal=SignalParams(
+            enter_threshold=args.enter_threshold,
+            exit_threshold=args.exit_threshold,
+            halflife_secs=args.halflife_secs,
+        ),
+        qty=args.qty,
+        stop_ticks=args.stop_ticks,
+        max_hold_secs=args.max_hold_secs,
+        improve_ticks=args.improve_ticks,
+    )
+    return _imbalance_factory(params, latency)
+
+
+def maker_backtest_cmd(args: argparse.Namespace) -> int:
+    settings = load_settings()
+    trade_date = _parse_date(args.date)
+    snaps = load_maker_snaps(settings, args.symbol, trade_date)
+    if not snaps:
+        print(f"no silver snaps for {args.symbol} (date={trade_date}); build silver first")
+        return 1
+    sessions = prepare_maker(snaps)
+    if not sessions:
+        print(f"no tradable sessions for {args.symbol} (date={trade_date})")
+        return 1
+    cost = _maker_cost_params(args)
+    strategy = _maker_strategy(args, cost.latency_secs)
+    result = run_maker(sessions, args.symbol, strategy, cost, trade_date)
+    print(f"symbol           {result.symbol}   (tick {sessions[0].tick_size})")
+    print(f"date             {result.trade_date or 'all'}")
+    print(f"strategy         {args.strategy}")
+    if args.strategy == "imbalance":
+        print(
+            f"signal           enter={args.enter_threshold} exit={args.exit_threshold} "
+            f"halflife={args.halflife_secs}s stop={args.stop_ticks}t hold<={args.max_hold_secs}s"
+        )
+    print(
+        f"cost             latency={cost.latency_secs}s attribution={cost.attribution} "
+        f"lot={args.qty}sh"
+    )
+    _print_maker_result(result, cost)
+    return 0
+
+
+@dataclass(frozen=True)
+class MakerSweepRow:
+    enter: float
+    halflife: float
+    stop_ticks: float
+    max_hold: float
+    improve: int
+    results: dict[str, MakerResult]
+
+    @property
+    def net(self) -> float:
+        return sum(r.net for r in self.results.values())
+
+    @property
+    def round_trips(self) -> int:
+        return sum(r.round_trips for r in self.results.values())
+
+    @property
+    def net_per_trip(self) -> float:
+        return self.net / self.round_trips if self.round_trips else 0.0
+
+    @property
+    def fill_rate(self) -> float:
+        posted = sum(r.posted_shares for r in self.results.values())
+        filled = sum(r.filled_maker_shares for r in self.results.values())
+        return filled / posted if posted else 0.0
+
+
+def maker_sweep_cmd(args: argparse.Namespace) -> int:
+    settings = load_settings()
+    trade_date = _parse_date(args.date)
+    cost = _maker_cost_params(args)
+
+    sessions_by_symbol: dict[str, tuple[MakerSession, ...]] = {}
+    for symbol in args.symbols:
+        snaps = load_maker_snaps(settings, symbol, trade_date)
+        sessions = prepare_maker(snaps) if snaps else ()
+        if not sessions:
+            print(f"warning: no tradable sessions for {symbol}; skipping")
+            continue
+        sessions_by_symbol[symbol] = sessions
+    if not sessions_by_symbol:
+        print("no data for any requested symbol")
+        return 1
+    symbols = list(sessions_by_symbol)
+
+    grid = [
+        (enter, halflife, stop, hold, improve)
+        for enter in args.enter_threshold
+        for halflife in args.halflife_secs
+        for stop in args.stop_ticks
+        for hold in args.max_hold_secs
+        for improve in args.improve_ticks
+        if args.exit_threshold <= enter  # SignalParams rejects exit > enter
+    ]
+    skipped = (
+        len(args.enter_threshold)
+        * len(args.halflife_secs)
+        * len(args.stop_ticks)
+        * len(args.max_hold_secs)
+        * len(args.improve_ticks)
+        - len(grid)
+    )
+    print(
+        f"maker sweep: {len(grid)} param sets x {len(symbols)} symbol(s) "
+        f"(date={trade_date or 'all'}, maker={cost.maker_commission_bps}bps, "
+        f"taker={cost.taker_commission_bps}bps, latency={cost.latency_secs}s, "
+        f"attribution={cost.attribution})"
+    )
+    if skipped:
+        print(f"skipped {skipped} combination(s) where exit_threshold > enter_threshold")
+
+    rows: list[MakerSweepRow] = []
+    for enter, halflife, stop, hold, improve in grid:
+        params = ImbalanceMakerParams(
+            signal=SignalParams(
+                enter_threshold=enter, exit_threshold=args.exit_threshold,
+                halflife_secs=halflife,
+            ),
+            qty=args.qty,
+            stop_ticks=stop,
+            max_hold_secs=hold,
+            improve_ticks=improve,
+        )
+        factory = _imbalance_factory(params, cost.latency_secs)
+        results = {
+            symbol: run_maker(sessions, symbol, factory, cost, trade_date)
+            for symbol, sessions in sessions_by_symbol.items()
+        }
+        rows.append(MakerSweepRow(enter, halflife, stop, hold, improve, results))
+
+    rows.sort(key=lambda r: r.net_per_trip if r.round_trips >= args.min_round_trips else -1e18, reverse=True)
+    head = (
+        f"{'enter':>6} {'half-l':>7} {'stop':>5} {'hold':>6} {'imp':>4} "
+        f"{'trips':>7} {'fill%':>6} {'net':>12} {'net/trip':>9}  "
+        + " ".join(f"{s:>12}" for s in symbols)
+        + f" {'pos':>5}"
+    )
+    print(head)
+    print("-" * len(head))
+    for row in rows[: args.top]:
+        positive = sum(
+            1
+            for s in symbols
+            if s in row.results
+            and row.results[s].round_trips >= args.min_round_trips
+            and row.results[s].net_per_trip > 0
+        )
+        cells = " ".join(
+            f"{row.results[s].net:>12,.0f}" if s in row.results else f"{'-':>12}"
+            for s in symbols
+        )
+        flag = "  <- thin sample" if row.round_trips < args.min_round_trips else ""
+        print(
+            f"{row.enter:>6.2f} {row.halflife:>7.2f} {row.stop_ticks:>5.1f} {row.max_hold:>6.0f} "
+            f"{row.improve:>4} "
+            f"{row.round_trips:>7,} {row.fill_rate:>6.1%} {row.net:>12,.0f} "
+            f"{row.net_per_trip:>9,.2f}  {cells} {positive:>3}/{len(symbols)}{flag}"
+        )
+    if rows and all(r.round_trips < args.min_round_trips for r in rows[: args.top]):
+        print(
+            f"note: no shown configuration reached {args.min_round_trips} round trips; "
+            "net -> 0 by not trading, judge nothing from this table."
+        )
+    return 0
+
+
 def _add_signal_args(parser: argparse.ArgumentParser, defaults: SignalParams) -> None:
     parser.add_argument("--enter-threshold", type=float, default=defaults.enter_threshold)
     parser.add_argument("--exit-threshold", type=float, default=defaults.exit_threshold)
@@ -332,6 +570,15 @@ def _add_cost_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--commission-bps", type=float, default=DEFAULT_COST.commission_bps)
     parser.add_argument("--lot", type=int, default=DEFAULT_COST.lot)
     parser.add_argument("--fill-delay-ticks", type=int, default=DEFAULT_COST.fill_delay_ticks)
+
+
+def _add_maker_cost_args(parser: argparse.ArgumentParser) -> None:
+    defaults = MakerCostParams()
+    parser.add_argument("--maker-bps", type=float, default=defaults.maker_commission_bps)
+    parser.add_argument("--taker-bps", type=float, default=defaults.taker_commission_bps)
+    parser.add_argument("--latency-secs", type=float, default=defaults.latency_secs)
+    parser.add_argument("--attribution", type=float, default=defaults.attribution)
+    parser.add_argument("--qty", type=int, default=100)
 
 
 def main() -> int:
@@ -370,7 +617,40 @@ def main() -> int:
         help="sample floor for the 'best with >=N trips' row (default: 100)",
     )
 
+    mb = subparsers.add_parser("maker-backtest", help="run a maker strategy on one symbol")
+    mb.add_argument("--symbol", required=True)
+    mb.add_argument("--date", type=str, default=None)
+    mb.add_argument("--strategy", choices=("benchmark", "imbalance"), default="imbalance")
+    mb.add_argument("--enter-threshold", type=float, default=0.6)
+    mb.add_argument("--exit-threshold", type=float, default=0.0)
+    mb.add_argument("--halflife-secs", type=float, default=1.0)
+    mb.add_argument("--stop-ticks", type=float, default=3.0)
+    mb.add_argument("--max-hold-secs", type=float, default=300.0)
+    mb.add_argument("--improve-ticks", type=int, default=0)
+    _add_maker_cost_args(mb)
+
+    ms = subparsers.add_parser("maker-sweep", help="grid-search the imbalance maker strategy")
+    ms.add_argument("--symbols", type=_symbols, default=_symbols(DEFAULT_MAKER_SYMBOLS))
+    ms.add_argument("--date", type=str, default=None)
+    ms.add_argument("--enter-threshold", type=_floats, default=[0.6])
+    ms.add_argument("--exit-threshold", type=float, default=0.0)
+    ms.add_argument("--halflife-secs", type=_floats, default=[1.0])
+    ms.add_argument("--stop-ticks", type=_floats, default=[3.0])
+    ms.add_argument("--max-hold-secs", type=_floats, default=[300.0])
+    ms.add_argument(
+        "--improve-ticks",
+        type=lambda v: [int(part) for part in v.split(",") if part.strip()],
+        default=[0],
+    )
+    ms.add_argument("--top", type=int, default=20)
+    ms.add_argument("--min-round-trips", type=int, default=100)
+    _add_maker_cost_args(ms)
+
     args = parser.parse_args()
+    if args.command == "maker-backtest":
+        return maker_backtest_cmd(args)
+    if args.command == "maker-sweep":
+        return maker_sweep_cmd(args)
     if args.command == "doctor":
         return doctor()
     if args.command == "ingest-bronze":
