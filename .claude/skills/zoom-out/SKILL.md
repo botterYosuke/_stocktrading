@@ -1,7 +1,26 @@
 ---
 name: zoom-out
-description: Tell the agent to zoom out and give broader context or a higher-level perspective. Use when you're unfamiliar with a section of code or need to understand how it fits into the bigger picture.
+description: Give a higher-level map of this stocktrading repository, a subsystem, or a strategy workflow.
 disable-model-invocation: true
 ---
 
-I don't know this area of code well. Go up a layer of abstraction. Give me a map of all the relevant modules and callers, using the project's domain glossary vocabulary.
+Go up one level of abstraction. Explain how the relevant modules, data layers,
+commands, tests, and strategy concepts fit together.
+
+Use this project's vocabulary:
+
+- bronze/silver/gold
+- board event
+- spread
+- imbalance
+- signal state
+- fill delay
+- round trip
+- churn suppression
+- taker cost
+- passive/maker fill
+- adverse selection
+- queue disadvantage
+
+Prefer file paths and concrete call chains over generic architecture talk.
+

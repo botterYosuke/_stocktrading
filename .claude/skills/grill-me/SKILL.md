@@ -1,10 +1,20 @@
 ---
 name: grill-me
-description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me". Also use to PRE-REGISTER a frozen decision protocol before seeing data/results (garden-of-forking-paths guard): "pre-register the verdict lines", "freeze the protocol before we run", "lock the adopt/reject thresholds", "採否ラインを凍結して" — drive each branch (metric, power floor, input discipline, verdict table, OOS rule, sequencing) to a frozen ruling one at a time.
+description: Stress-test a stocktrading plan or experiment design before implementation or before looking at results.
 ---
 
-Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+Interview the user about the plan until the decision protocol is clear.
 
-Ask the questions one at a time.
+Use this for:
 
-If a question can be answered by exploring the codebase, explore the codebase instead.
+- Pre-registering thresholds before a sweep or backtest.
+- Freezing sample floors, OOS symbols/dates, and pass/fail lines.
+- Stress-testing whether a proposed maker/taker strategy can survive costs,
+  spread, adverse selection, and realistic fills.
+- Clarifying exactly what result would cause the idea to be rejected.
+
+Ask one question at a time. For each question, provide your recommended answer.
+
+If a question can be answered from the repository, inspect the code instead of
+asking the user.
+
