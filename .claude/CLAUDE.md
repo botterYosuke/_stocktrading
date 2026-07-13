@@ -1,45 +1,55 @@
 # stocktrading Claude Guide
 
-This repository is a Python workspace for testing Japanese stock day-trading
-strategies from order-book data. Keep Claude instructions short and tied to this
-codebase; do not import rules from other strategy projects unless they are
-actually used here.
+Python workspace for validating Japanese stock day-trading strategies against
+order-book data.
 
 ## Project Facts
 
-- Source code lives in `src/stocktrading`.
-- Tests live in `tests`.
-- The data pipeline is medallion-style:
-  - `bronze`: copy/normalize raw source files with minimal interpretation.
-  - `silver`: normalized board events and derived market columns.
-  - `gold`: strategy-readable features and backtest inputs.
+- Source in `src/stocktrading`, tests in `tests`.
+- Medallion pipeline: `bronze` (raw, minimal interpretation) -> `silver`
+  (normalized board events, mid/spread/imbalance) -> `gold` (per-tick signal
+  output the strategy reads).
 - `C:\Users\sasai\Documents\backcast` is external infrastructure. Do not edit it
   from this repository.
-- Current live execution is constrained by `submit_market`; treat this as a
-  strategy bottleneck, not as a permanent design assumption.
-
-## Current Strategy Context
-
-- Churn suppression is useful because it reduces taker losses, but it is not an
-  edge by itself.
-- The current imbalance taker strategy is structurally unprofitable after spread
-  and commission. Do not present lower turnover as proof of alpha.
-- The next important research direction is passive/maker execution: model limit
-  orders, cancellations, conservative fills, queue disadvantage, latency,
-  adverse selection, and spread capture.
-- Any profitable-looking configuration with a tiny sample is suspect. Prefer
-  minimum sample floors, cross-symbol checks, and explicit `net/trip` reporting.
+- Live execution currently offers only `submit_market`. Any strategy that needs
+  limit orders cannot be run live yet.
 
 ## Development Rules
 
-- Run `uv run pytest` before claiming implementation is complete.
-- Keep signal functions pure where possible so backtest and live code can share
-  them.
-- Use shared SQL escaping helpers for dynamic SQL literals.
-- Backtests must reset position, signal state, fill-delay window, and clock at
-  each trading day/session boundary.
-- Be conservative in simulation. If fill logic is uncertain, bias against the
+- Run `uv run pytest` before claiming an implementation is complete.
+- `signals.py` must stay pure and I/O-free: the backtest and the future live cell
+  share it. State is passed in and returned, never held in the module.
+- The backtest and the gold writer must both derive targets from
+  `signals.fold_states`. Never re-express the signal rule in SQL.
+- Backtests reset position, signal state, fill-delay window and clock at every
+  session boundary. Nothing survives the overnight gap.
+- Inline SQL literals go through `sql.sql_str`. DuckDB cannot bind parameters
+  inside `CREATE`/`COPY`.
+- Never hand DuckDB bulk Python values (`executemany`, list parameters). The
+  conversion is quadratic -- a 93k-row day costs ~10 minutes. Stage through its
+  CSV reader instead.
+- Be conservative in simulation. Where fill logic is uncertain, bias against the
   strategy.
+
+## Reading Results
+
+- Ranking configurations by net PnL rewards not trading: net approaches 0 from
+  below as turnover falls. Judge a signal by **net per round trip**, and only
+  over a defensible sample (`sweep --min-round-trips`).
+- Low turnover is not evidence of alpha.
+- **The symmetric trap**: ranking by *net per entry* rewards trading only **once**
+  (on the one lucky day). A day-selector can "pick winning days" or "point at days
+  that happened to win" -- the numbers look identical.
+- Strategies are no longer scored alone. The unit is **(G, S) = day-selector x
+  strategy**, scored on **net return per entry**, and it is only admissible after
+  passing the G1-G8 guardrails (causality / matched null on the *selector* /
+  concentration cap / min firings / IS-OOS freeze / friction ratio >= 3 /
+  executability / honest-N). See **`docs/adr/ADR-0001-evaluation-standard.md`**
+  (canonical; mirrored as pointers in the other three repos).
+
+The standing conclusion about the imbalance signal's viability lives in
+`docs/architecture.md`. Read it there rather than restating it here, and update
+it there when the evidence changes.
 
 ## Useful Commands
 
@@ -52,4 +62,3 @@ uv run python -m stocktrading.cli build-silver --date 2026-07-09
 uv run python -m stocktrading.cli backtest --symbol 9984 --date 2026-07-09
 uv run python -m stocktrading.cli sweep --symbols 9984,285A,5803 --date 2026-07-09
 ```
-
