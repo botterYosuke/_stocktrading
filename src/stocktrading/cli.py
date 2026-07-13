@@ -4,6 +4,7 @@ import argparse
 from dataclasses import dataclass
 from datetime import date
 from itertools import product
+from pathlib import Path
 
 from .backtest import (
     BacktestResult,
@@ -16,6 +17,18 @@ from .backtest import (
 )
 from .bronze import export_to_bronze
 from .config import Settings, load_settings
+from .leadlag import (
+    DAY0_DATE,
+    MIN_SESSIONS,
+    PAIRS,
+    REQUIRED_SYMBOLS,
+    eligible_dates_from_manifests,
+    integrity_check,
+    run_feasibility,
+    run_full,
+    write_events_parquet,
+    write_json,
+)
 from .maker import (
     MakerCostParams,
     MakerResult,
@@ -581,6 +594,106 @@ def _add_maker_cost_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--qty", type=int, default=100)
 
 
+def integrity_check_cmd(args: argparse.Namespace) -> int:
+    """Recorder integrity gate: does this day even qualify as a full session?"""
+    settings = load_settings()
+    trade_date = _parse_date(args.date)
+    out_dir = Path(args.out_dir)
+    manifest = integrity_check(settings, trade_date, today=_parse_date(args.as_of))
+    path = out_dir / f"integrity_{trade_date.isoformat()}.json"
+    write_json(manifest, path)
+
+    print(f"date             {manifest['date']}")
+    print(f"as of            {manifest['as_of']}")
+    print(f"file size        {manifest['file_size_bytes']} bytes")
+    print(f"wal present      {manifest['wal_present']}")
+    print(f"opened           {manifest['opened']}")
+    print(f"rows             {manifest['row_count']}")
+    print(f"ts range         {manifest['min_ts']} .. {manifest['max_ts']}")
+    print(f"distinct codes   {manifest['distinct_codes']}")
+    missing = manifest["required_symbols_missing"]
+    print(f"required 25      missing={len(missing) if missing is not None else 'n/a'}")
+    for reason in manifest["failures"]:
+        print(f"  FAIL           {reason}")
+    print(f"FULL_SESSION_ELIGIBLE={manifest['FULL_SESSION_ELIGIBLE']}")
+    print(f"manifest         {path}")
+    return 0
+
+
+def leadlag_phase_a_cmd(args: argparse.Namespace) -> int:
+    """Phase A signal study. Feasibility mode counts; full mode scores.
+
+    Full mode refuses to run until five eligible sessions exist, and it counts
+    them off integrity manifests rather than off filenames. That refusal is the
+    power floor made structural: a WAIT_DATA that still wrote drift and edge
+    columns would be an invitation to read them.
+    """
+    settings = load_settings()
+    out_dir = Path(args.out_dir)
+
+    if args.mode == "feasibility":
+        if not args.date:
+            print("--mode feasibility requires --date")
+            return 1
+        trade_date = _parse_date(args.date)
+        doc = run_feasibility(settings, trade_date)
+        path = out_dir / "day0_feasibility.json"
+        write_json(doc, path)
+
+        print(f"mode             feasibility (counts only; no outcome is computed)")
+        print(f"date             {doc['date']}")
+        print(f"directed pairs   {len(PAIRS)}  (symbols {len(REQUIRED_SYMBOLS)})")
+        print("")
+        print(f"{'leader':>7} {'eligible':>9} {'evaluable':>10} {'triggers':>9} "
+              f"{'duty%':>7} {'onsets':>7} {'inflation':>10}")
+        for leader, v in doc["leaders"].items():
+            print(
+                f"{leader:>7} {v['n_eligible_snaps']:>9,} {v['n_evaluable_snaps']:>10,} "
+                f"{v['raw_trigger_snaps']:>9,} {v['trigger_duty_cycle'] * 100:>7.3f} "
+                f"{v['onset_events']:>7,} {v['event_inflation_ratio']:>10.2f}"
+            )
+        print("")
+        print(f"{'pair':>12} {'onsets':>7} {'events':>7} {'m0%':>6} {'bridge%':>8} "
+              f"{'ev/day':>7} {'days->200':>10} {'status':>8}")
+        for key, v in doc["pairs"].items():
+            print(
+                f"{key:>12} {v['onset_events']:>7,} "
+                f"{v['events_with_follower_reference']:>7,} "
+                f"{v.get('follower_reference_availability', 0.0) * 100:>6.1f} "
+                f"{v.get('bridge_entry_availability_of_onsets', 0.0) * 100:>8.1f} "
+                f"{v['events_per_day']:>7.1f} {v['days_to_200_events']:>10} "
+                f"{v['status']:>8}"
+            )
+        print("")
+        print(f"reading          {doc['reading']}")
+        print(f"report           {path}")
+        return 0
+
+    eligible = [
+        d for d in eligible_dates_from_manifests(Path(args.manifest_dir or args.out_dir))
+        if d != DAY0_DATE
+    ]
+    print(f"eligible full sessions (excluding Day-0 {DAY0_DATE}): {len(eligible)}")
+    for d in eligible:
+        print(f"  {d.isoformat()}")
+    if len(eligible) < MIN_SESSIONS:
+        # Structural refusal: no outcome column is computed, so there is nothing
+        # to peek at. The threshold is frozen and is not negotiable here.
+        print(
+            f"WAIT_DATA: {len(eligible)} of {MIN_SESSIONS} required full sessions. "
+            "No performance column computed."
+        )
+        return 0
+
+    report, rows = run_full(settings, eligible)
+    write_json(report, out_dir / "phaseA_report.json")
+    n = write_events_parquet(rows, out_dir / "phaseA_events.parquet")
+    print(f"events           {n:,}")
+    print(f"decision         {report['decision']}")
+    print(f"report           {out_dir / 'phaseA_report.json'}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="stocktrading")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -646,7 +759,38 @@ def main() -> int:
     ms.add_argument("--min-round-trips", type=int, default=100)
     _add_maker_cost_args(ms)
 
+    ll = subparsers.add_parser(
+        "leadlag-phase-a", help="Family 3 cross-name lead-lag, Phase A signal study"
+    )
+    ll.add_argument("--mode", choices=("full", "feasibility"), default="full")
+    ll.add_argument("--date", type=str, default=None, help="feasibility mode only")
+    ll.add_argument("--out-dir", required=True)
+    ll.add_argument(
+        "--manifest-dir",
+        default=None,
+        help="where integrity_<date>.json manifests live (default: --out-dir)",
+    )
+
+    ic = subparsers.add_parser(
+        "integrity-check", help="recorder integrity gate for one recording day"
+    )
+    ic.add_argument("--date", type=str, required=True)
+    ic.add_argument("--out-dir", required=True)
+    ic.add_argument(
+        "--as-of",
+        type=str,
+        default=None,
+        help=(
+            "judge the day as of this date (default: today, which refuses the "
+            "current day outright). The live-WAL check is never bypassed."
+        ),
+    )
+
     args = parser.parse_args()
+    if args.command == "leadlag-phase-a":
+        return leadlag_phase_a_cmd(args)
+    if args.command == "integrity-check":
+        return integrity_check_cmd(args)
     if args.command == "maker-backtest":
         return maker_backtest_cmd(args)
     if args.command == "maker-sweep":
