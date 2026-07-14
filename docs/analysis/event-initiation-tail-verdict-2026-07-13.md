@@ -209,8 +209,17 @@ J-Quants の信用取引週末残高で近似できる可能性はある。
 
 ## 11. honest-N の材料（判定は司令塔）
 
-本セッションは台帳最後の live リードを閉じた。カウント方法により N は 24 → 25〜27。
-HALT-1（総 N=30 で systemic null 宣言）まで **残り3〜5**。
+本セッションは台帳最後の live リードを閉じた。~~カウント方法により N は 24 → 25〜27。~~
+~~HALT-1（総 N=30 で systemic null 宣言）まで **残り3〜5**。~~
+
+> **司令塔判定（2026-07-14 追記・記録は書き換えない）**: 本セッション（`event_initiation_tail`）の消費は
+> **24 → 25 で確定**（1 消費。commit `4f46452`）。ここで開いたままにした「25〜27」の幅は closed。
+>
+> **ただしその後 2026-07-14 に、並行3セッションが揃って「25→26」を三重記帳する衝突が発生**
+> （`comp_top5` @_bellwether 08:42 / `margin_supply_shock` @_sacrificial-lamb 09:41 /
+> `v19_lowfric` @_sacrificial-lamb 14:29）。reconcile 後の
+> **現在値 = honest-N 28 / HALT-1 = 30 まで 残り 2。**
+> 正本 = `_bellwether/docs/plan/winner-factory-proposals.md`【RECONCILIATION】節（2026-07-14）。
 
 死因の形は過去の全 family と同型:
 **gross < friction、または gross が「触れない場所」に存在する。**
