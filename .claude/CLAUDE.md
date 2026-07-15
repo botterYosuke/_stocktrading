@@ -3,6 +3,19 @@
 Python workspace for validating Japanese stock day-trading strategies against
 order-book data.
 
+## External command center vault (`note`) -- check it if it exists
+
+`D:\Documents\note` (Obsidian vault "note") is the cross-repo command center for all four
+strategy repos (bellwether / blacksheep / sacrificial-lamb / stocktrading). If it exists on
+this machine, check it before starting non-trivial work:
+
+- `Projects/株価シュミレーション/株価シュミレーション.md` -- overall hypothesis, signal log, current bet
+- `Projects/株価シュミレーション/リポジトリ変遷史.md` -- why the work split into 4 repos, when to use which
+- `Projects/株価シュミレーション/戦略台帳.md` -- a cross-repo index of ~372 verdicts aggregated from
+  the other three repos' logs and ledgers (heuristically extracted, v1 -- treat as a pointer,
+  not ground truth). Useful for checking whether an idea was already tried and killed elsewhere
+  before implementing it here.
+
 ## Project Facts
 
 - Source in `src/stocktrading`, tests in `tests`.
