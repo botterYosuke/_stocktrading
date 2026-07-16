@@ -38,6 +38,7 @@ def available_days() -> list[str]:
 
 def list_codes(day: str) -> list[str]:
     with duckdb.connect(str(db_path(day)), read_only=True) as con:
+        con.execute("SET enable_progress_bar=false")
         rows = con.execute(
             "select distinct code from board_push order by code"
         ).fetchall()
@@ -52,6 +53,7 @@ def load_symbol_day(day: str, code: str) -> dict[str, np.ndarray]:
     """
     cols = ", ".join(_COLUMNS)
     with duckdb.connect(str(db_path(day)), read_only=True) as con:
+        con.execute("SET enable_progress_bar=false")
         result = con.execute(
             f"""
             select {cols} from board_push

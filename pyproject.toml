@@ -12,6 +12,7 @@ dependencies = [
     "pydantic>=2.13",
     "python-dotenv>=1.1",
     "websockets>=15.0",
+    "pyarrow>=25.0.0",
 ]
 
 [dependency-groups]
