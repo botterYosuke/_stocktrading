@@ -17,12 +17,22 @@ gen1（LightGBM × トリプルバリア taker）を実装・検証し **IS-KILL
 
 ## 次の一手（優先順）
 
-1. **録画の毎営業日再開**（最大ボトルネック、変わらず）: `_bellwether/scripts/
-   kabu_board_paper_trader.py`（凍結・参照のみ）の WS 受信/録画コアを
-   `src/scalp_agent/runtime/` に移植。PUSH 1 コネクション制約（SKILL R8）。
+1. **統合ランタイム（owner 指示 2026-07-16 夕・明日から毎営業日稼働）**:
+   板 PUSH を録画しながらペーパートレードを行う。**約定はデモ口座任せにせず、
+   板情報から独自に判断する仮想約定エンジン**を作る（検証環境 18081 は約定エンジンを
+   持たない検証スタブと実測済み — memory `kabu-verify-env-stateless`）。
+   `_bellwether/scripts/kabu_board_paper_trader.py`（凍結・参照のみ）の WS 受信/
+   録画コアを `src/scalp_agent/runtime/` に移植し、録画・特徴量・推論・仮想執行を
+   単一プロセスに統合（SKILL R8: PUSH 1 コネクション）。仮想 fill は
+   `execution.py` の保守的規則（next-PUSH 対向 best・トリプルバリア）のライブ版を共有。
 2. データが積もったら同一プロトコルの次サイクル（同 family・honest-N 加算）。
    格子・閾値・特徴の変更は新 family + 新 sealed データが必要（G8）。
 3. PyTorch 小型 NN 比較（DESIGN 決定 5）はエッジの兆候が出てから。
+
+**未決（着手前に owner と確定）**: ペーパートレードのシグナル源。gen1 は IS-KILL で
+凍結セルが無い。fill 較正目的（DESIGN 決定 2）なら「較正専用・判定に使わない」と
+明記した上で暫定モデル（例: h5s×m3.0×τ0.70 相当）を shadow 稼働させる案が有力だが、
+G8 に触れない位置づけの確認が必要。
 
 ## 環境ファクト
 
