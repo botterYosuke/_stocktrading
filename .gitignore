@@ -4,7 +4,16 @@ __pycache__/
 .env
 data/
 models/
-artifacts/
+# artifacts 配下は原則追跡しない。ただし板読みランタイムの較正モデルだけは例外
+# (他機での再学習には S: の録画が要るため、コミットしないと他機で起動できない)。
+# 各階層で「中身」を除外しないと再包含が効かない (git: 除外された親の下は復活不可)。
+artifacts/*
+!artifacts/calibration/
+artifacts/calibration/*
+!artifacts/calibration/shadow_h5_m30/
+artifacts/calibration/shadow_h5_m30/*
+!artifacts/calibration/shadow_h5_m30/model.txt
+!artifacts/calibration/shadow_h5_m30/meta.json
 *.duckdb
 *.duckdb.wal
 .pytest_cache/
