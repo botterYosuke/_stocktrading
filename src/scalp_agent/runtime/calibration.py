@@ -20,7 +20,8 @@ CAL_MULT = 3.0
 CAL_TAU = 0.70
 CAL_TRAIN_DAYS = ("2026-07-09", "2026-07-13")  # role "train+val"
 
-MODEL_DIR = Path("artifacts/calibration/shadow_h5_m30")
+_REPO = Path(__file__).resolve().parents[3]
+MODEL_DIR = _REPO / "artifacts" / "calibration" / "shadow_h5_m30"
 MODEL_PATH = MODEL_DIR / "model.txt"
 META_PATH = MODEL_DIR / "meta.json"
 
