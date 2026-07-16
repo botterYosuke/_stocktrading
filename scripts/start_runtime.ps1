@@ -1,4 +1,4 @@
-# scalp-agent 統合ランタイム起動 (毎朝 owner が kabu 本体ログイン後に手動実行 — DESIGN 決定 11)
+﻿# scalp-agent 統合ランタイム起動 (毎朝 owner が kabu 本体ログイン後に手動実行 — DESIGN 決定 11)
 #
 #   .\scripts\start_runtime.ps1                 # 通常運転 (録画 + ペーパー、15:35 自己終了)
 #   .\scripts\start_runtime.ps1 -RecordOnly     # 録画のみ (モデル不要)
