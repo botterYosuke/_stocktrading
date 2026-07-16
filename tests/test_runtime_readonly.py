@@ -15,6 +15,8 @@ FORBIDDEN = [
     "/wallet/",
     "/positions",
     "/orders",
+    # 共存契約 (2026-07-16): 全解除は同居プロセスの登録を消すため禁止
+    "unregister" + "/all",
 ]
 
 
@@ -28,8 +30,12 @@ def test_runtime_sources_contain_no_order_endpoints():
 
 
 def test_runtime_allowed_endpoints_only():
-    """URL パスは /token・/register・/unregister/all・/websocket のみ。"""
-    allowed = {"/token", "/register", "/unregister/all", "/kabusapi"}
+    """URL パスは /token・/register・/unregister・/websocket のみ。
+
+    共存契約 (2026-07-16): /unregister/all は同居プロセス (agree_biggap) の
+    登録を消すため禁止。解除は自ユニバース指定の /unregister のみ。
+    """
+    allowed = {"/token", "/register", "/unregister", "/kabusapi"}
     import re
     for p in sorted(RUNTIME_DIR.glob("*.py")):
         text = p.read_text(encoding="utf-8")

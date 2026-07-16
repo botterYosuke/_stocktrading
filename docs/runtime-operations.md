@@ -23,6 +23,29 @@
   を読むこと
 - 多重起動しない（start_runtime.ps1 がガードする）
 
+## agree_biggap 実弾トレーダーとの共存契約（2026-07-16 owner 確定）
+
+同一マシン・同一 kabu 本体（18080）で `_bellwether/scripts/kabu_agree_biggap_live_trader.py`
+（寄りギャップ実弾・09:01 起動・15:30 引成決済）と同居する。契約は 3 点:
+
+1. **token 発行者は本ランタイムただ一人**。agree_biggap は
+   `current_token.json` を読み、401 ではファイル再読で追従する。本ランタイム不在
+   （heartbeat 60 秒以上無音）のときだけ agree_biggap が solo 発行する（owner 承認済み）。
+   したがって**朝は 08:45 本ランタイム → 09:01 agree_biggap の順**が正だが、
+   逆順・再起動でも自己修復する
+2. **全銘柄一括解除の禁止**（双方）。解除は自分が登録した銘柄の指定解除
+   （`PUT /unregister`）のみ。`tests/test_runtime_readonly.py` が grep 監査で固定
+3. **register 50 枠 = 板読み 40 / agree_biggap 10**。universe は mid tier 10 銘柄を
+   停止して 40（`scripts/board_recorder_universe.txt` ヘッダ参照・owner 承認済み）。
+   register 検証は件数でなく「自 universe が RegistList に全員居るか」で行う
+   （RegistList は機械全体の全量が返り agree_biggap 分が混ざるため）
+4. **登録銘柄の公開**: 本ランタイムは register 成功時に自分の登録銘柄を
+   `current_registered.json` へ書き出す。register は機械全体で参照カウントが無く、
+   agree_biggap の候補銘柄が本ランタイムの universe と重複した場合、agree_biggap 側の
+   スキャン後解除が本ランタイムの PUSH を silent に止めてしまう。agree_biggap は
+   このファイルの銘柄を「解除禁止」として扱う（2026-07-16 実 API 統合確認済み:
+   7203/9984 重複スキャン後も 40 銘柄無傷・録画継続）
+
 ## 構成（kabusapi SKILL R8: PUSH は最新 1 コネクションのみ）
 
 単一 asyncio プロセスに同居:
