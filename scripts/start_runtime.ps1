@@ -15,7 +15,17 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
-$envFile = 'C:\Users\sasai\Documents\backcast\.env'
+# backcast/.env の在処は端末ごとに違うので直書きしない (2026-07-16 に C:\Users\sasai へ
+# 直書きし、kabu 本体が動いている D: 機で板読みが起動不能になった)。BACKCAST_ENV_FILE で上書き可
+$envFile = $env:BACKCAST_ENV_FILE
+if (-not $envFile) {
+    foreach ($c in @('D:\Documents\backcast\.env', 'C:\Users\sasai\Documents\backcast\.env')) {
+        if (Test-Path $c) { $envFile = $c; break }
+    }
+}
+if (-not $envFile -or -not (Test-Path $envFile)) {
+    Write-Error 'backcast\.env が見つからない (BACKCAST_ENV_FILE で明示指定できる)'; exit 2
+}
 $line = Select-String -Path $envFile -Pattern '^PROD_KABU_API_PASSWORD=(.+)$' | Select-Object -First 1
 if (-not $line) { Write-Error "PROD_KABU_API_PASSWORD が $envFile に見つからない"; exit 2 }
 $env:KABU_API_PASSWORD = $line.Matches[0].Groups[1].Value
