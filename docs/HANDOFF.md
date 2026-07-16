@@ -75,6 +75,11 @@ fresh sealed days で評価。全 eligible 1Hz 行の next-PUSH 遷移も別 tel
 
 ## 次の一手（優先順）
 
+0. **【明朝 08:45 期限】agree_biggap（_bellwether・実弾・09:01 稼働）との kabu API 並走化**:
+   正本 = `C:\Users\sasai\AppData\Local\Temp\HANDOFF-kabu-parallel-run-2026-07-17.md`。
+   現状のままだと token 相互失効 + unregister/all で**双方死ぬ**（調査済み・file:line 付き）。
+   共存契約案（token 単一発行者 + 共有ファイル / unregister/all 両者禁止 / 枠 40:10 分割）
+   と owner 確定事項 3 点は同ハンドオフ参照
 1. **明朝のフル稼働初日**: start_runtime.ps1（08:45 目標）→ 場中に heartbeat
    （`S:/jp/stocks_board_kabu_push/heartbeat_kabu_<date>.log`）で msgs 増加を確認。
    終了後 `artifacts/runtime/<date>/summary.json`・audit.jsonl・録画行数・
