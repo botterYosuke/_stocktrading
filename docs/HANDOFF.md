@@ -30,6 +30,24 @@ gen1 とコード共有、テスト 88 本通過、DESIGN.md に gen1b 節あり
 板特徴を抜くと gen1 の限られたグロス（1.67bps）すら消える。07-14 は gen1b でも
 未開封。録画が積もった後の次サイクルは可能だが優先度は gen1 系より下。
 
+**足読み gen2（stocks_minute 歴史分足・owner 指示の P1/P2/P3 試行錯誤）も IS-KILL**
+（台帳 375 行目・`docs/analysis/gen2-minute-p1p2p3-is-kill-2026-07-16.md`）。
+`S:/jp/stocks_minute` のフル履歴 17 銘柄・train 371 日 / val 62 日（**初の D≥20 検定力**）で、
+P1 銘柄別 / P2 市場・最相関ペア特徴 / P3 クロスセクション top-1 の 54 構成すべて
+gross 中央値 ≈ 0bps（摩擦 3.5bps・のべ 93 万取引）。**エッジ候補の源泉は板の
+ミクロ構造であり、バー集計では消える**ことが高検定力で確定。sealed OOS
+（2025-10-01〜2026-02-18）は未開封 — 次の新 family が OOS として使える。
+実装は `src/scalp_agent_bars/minute/` + `scripts/gen2_minute_pipeline.py`
+（保守的バー執行モデル・friction は板録画実測から凍結較正、DESIGN.md「足読み gen2」節）。
+
+**足読み gen3（系列 NN・学習器対照実験）も IS-KILL**（台帳 376 行目・
+`docs/analysis/gen3-minute-nn-is-kill-2026-07-16.md`）。owner の「学習が弱いのでは」
+に答えるため、gen2 と同一ラベル/執行/分割のまま GRU×生分足系列 32 本へ学習器だけ
+強化 → val 62 日・n≥300 の全構成で gross 負（中央値 −0.18bps）。**「学習器の弱さ」
+仮説は棄却** — 分足 OHLCV に情報が無いことを 2 つの学習器ファミリーで確認。
+torch 2.6+cu124 は pyproject `nn` グループ（`uv sync --group nn`・PyTorch index は
+torch のみに束縛）。sealed OOS（2025-10〜2026-02）は依然未開封。
+
 ## このセッション（夜）でやったこと
 
 1. グリルで未決 3 点を owner と確定（DESIGN.md へ反映済み）:

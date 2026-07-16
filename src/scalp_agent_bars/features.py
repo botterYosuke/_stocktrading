@@ -13,7 +13,7 @@ import hashlib
 
 import numpy as np
 
-from scalp_agent.bars.config import VOL_MED_BARS, VOL_MED_MIN_BARS
+from scalp_agent_bars.config import VOL_MED_BARS, VOL_MED_MIN_BARS
 
 RET_BARS = (1, 3, 5, 15)
 RANGE_BARS = (5, 15)
