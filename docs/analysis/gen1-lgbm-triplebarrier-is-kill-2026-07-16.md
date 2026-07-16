@@ -1,6 +1,7 @@
 # gen1 LightGBM × トリプルバリア taker — IS-KILL（2026-07-16）
 
-- Family: `scalp-taker-triplebarrier-lgbm`（gen1、honest-N = 1）
+- 系統名: **板読み (ITAYOMI)** — 板 PUSH シグナル系（2026-07-16 命名。日足・分足系は「足読み (ASHIYOMI)」）
+- Family: `scalp-taker-triplebarrier-lgbm`（板読み gen1、honest-N = 1）
 - 判定: **IS-KILL** — 07-13 IS validation で候補セル 0。凍結プロトコルに従い
   **07-14（OOS）は未開封のまま**。OOS 探針・G2 代替ヌルは実施していない。
 - config hash: `28eb2ba6cf0c22d718bba5e744bcc2d22c05e14e7447759650ce6b4f3d4db866`

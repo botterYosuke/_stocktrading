@@ -13,9 +13,22 @@ cd C:\Users\sasai\Documents\_stocktrading
 .\scripts\start_runtime.ps1        # kabu 本体ログイン後・08:45 目標・15:35 自己終了
 ```
 
-gen1（LightGBM × トリプルバリア taker）は **IS-KILL** で確定済み
+系統名（DESIGN.md「系統コードネーム」節・2026-07-16 命名）:
+**板読み (ITAYOMI)** = 板 PUSH シグナル系（`src/scalp_agent/`）/
+**足読み (ASHIYOMI)** = 日足・分足シグナル系（`src/scalp_agent/bars/`）。
+
+板読み gen1（LightGBM × トリプルバリア taker）は **IS-KILL** で確定済み
 （`docs/analysis/gen1-lgbm-triplebarrier-is-kill-2026-07-16.md`・台帳 373 行目）。
 **07-14 は未開封のまま封印維持**（ランタイムのシグナル源にも一切使っていない）。
+
+**足読み gen1b（兄弟 family・板非依存の分足/日足）も同日 IS-KILL**（台帳 374 行目・
+`docs/analysis/gen1b-bars-lgbm-triplebarrier-is-kill-2026-07-16.md`）。owner 指示で
+「板情報を使わず日足・分足でスキャルする兄弟 ML-Agent」を `src/scalp_agent/bars/` +
+`scripts/gen1b_pipeline.py` に実装（1分足18特徴 + 前日日足、執行/ラベル/ゲートは
+gen1 とコード共有、テスト 88 本通過、DESIGN.md に gen1b 節あり）。07-13 val で
+**net>0 のセルが n を問わずゼロ**（gross 中央値 −0.15bps ＜ friction 4.13bps）。
+板特徴を抜くと gen1 の限られたグロス（1.67bps）すら消える。07-14 は gen1b でも
+未開封。録画が積もった後の次サイクルは可能だが優先度は gen1 系より下。
 
 ## このセッション（夜）でやったこと
 

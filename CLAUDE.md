@@ -13,6 +13,9 @@ kabu API を触る作業は必ず先に `C:/Users/sasai/Documents/backcast/.clau
 ## Project Facts
 
 - Source は `src/scalp_agent`、tests は `tests/`。Python 3.13 + uv。
+- エージェントは 2 系統（DESIGN.md「系統コードネーム」節）: **板読み (ITAYOMI)** =
+  板 PUSH シグナル（`src/scalp_agent/`）/ **足読み (ASHIYOMI)** = 日足・分足シグナル
+  （`src/scalp_agent/bars/`）。執行・ラベル・ゲートは両系統でコード共有。
 - 録画データ: `S:/jp/stocks_board_kabu_push/<date>.duckdb` の `board_push` テーブル
   （ワイド形式・1 PUSH msg = 1 行・bid_*=買い板/ask_*=売り板に正規化済み）。
 - 録画・ペーパートレードの実証済み参考実装: `_bellwether/scripts/kabu_board_paper_trader.py`
