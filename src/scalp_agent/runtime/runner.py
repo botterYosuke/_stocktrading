@@ -111,8 +111,11 @@ class RuntimeApp:
         self.outputs = None
         if not args.record_only:
             from scalp_agent.runtime.outputs import PaperOutputs
-            booster = calibration.load_booster()
-            meta = {**calibration.model_meta(), "model_version": calibration.model_version()}
+            # 既定 (env SCALP_DAILY_MODEL 未設定) は従来どおり frozen shadow を返す。
+            # SCALP_DAILY_MODEL=1 のときだけ daily champion を試み、失敗は shadow へ
+            # フォールバック (daily_model.py — DESIGN 決定 12 の opt-in)。
+            from scalp_agent.runtime.daily_model import load_runtime_model
+            booster, meta = load_runtime_model(log)
             self.outputs = PaperOutputs(
                 os.path.join(RUNTIME_OUT_DIR, self.day_str), self.day_str, meta)
             self.trader = PaperTrader(
