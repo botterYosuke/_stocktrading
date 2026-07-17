@@ -64,6 +64,11 @@ EXIT_HARD = 1
 
 # ── 録画健全性の床 (完全営業日は 1.1M〜3.0M 行の実績) ──
 ROW_FLOOR = 500_000
+# 銘柄別の床: 同居 agree_biggap のスキャン register 由来で universe 外の疎銘柄
+# (1〜数百行) が録画へ混入する (共存契約 2026-07-16、実発生 2026-07-17: 188 銘柄・
+# 最大 138 行)。正規 universe 銘柄の実績最小は ~30k 行/日のため 5,000 で分離できる。
+# 疎銘柄は exec_subset 後に空になり特徴量計算が落ちる/学習分布を汚すので学習から除外。
+CODE_ROW_FLOOR = 5_000
 UNIVERSE_COVERAGE_MIN = 0.90
 HEARTBEAT_MIN_TOD = dtime(15, 25)
 UNIVERSE_PATH = REPO / "scripts" / "board_recorder_universe.txt"
@@ -92,6 +97,15 @@ def db_row_stats(day: str) -> tuple[int, list[str]]:
         codes = [r[0] for r in con.execute(
             "select distinct code from board_push order by code").fetchall()]
     return int(n), codes
+
+
+def db_code_counts(day: str) -> dict[str, int]:
+    """銘柄別の PUSH 行数 (CODE_ROW_FLOOR による混入除外の判定材料)。"""
+    with duckdb.connect(str(loader.db_path(day)), read_only=True) as con:
+        con.execute("SET enable_progress_bar=false")
+        rows = con.execute(
+            "select code, count(*) from board_push group by code").fetchall()
+    return {r[0]: int(r[1]) for r in rows}
 
 
 def recording_check(day: str) -> str | None:
@@ -174,7 +188,12 @@ def load_training_tables(train_days: list[str]) -> dict:
     tables = {}
     for day in train_days:
         if loader.db_path(day).exists():
-            codes = loader.list_codes(day)
+            counts = db_code_counts(day)
+            codes = sorted(c for c, n in counts.items() if n >= CODE_ROW_FLOOR)
+            skipped = sorted(c for c, n in counts.items() if n < CODE_ROW_FLOOR)
+            if skipped:
+                log(f"  {day}: 銘柄別床未満 {len(skipped)} 銘柄を学習から除外"
+                    f" (同居トレーダー由来の混入対策): {skipped[:8]}{'...' if len(skipped) > 8 else ''}")
             get = ensure_cache
         else:
             cache_day_dir = Path("artifacts/cache/gen1") / day

@@ -7,13 +7,7 @@ models/
 # artifacts 配下は原則追跡しない。ただし板読みランタイムの較正モデルだけは例外
 # (他機での再学習には S: の録画が要るため、コミットしないと他機で起動できない)。
 # 各階層で「中身」を除外しないと再包含が効かない (git: 除外された親の下は復活不可)。
-artifacts/*
-!artifacts/calibration/
-artifacts/calibration/*
-!artifacts/calibration/shadow_h5_m30/
-artifacts/calibration/shadow_h5_m30/*
-!artifacts/calibration/shadow_h5_m30/model.txt
-!artifacts/calibration/shadow_h5_m30/meta.json
+# artifacts/*
 # nightly retrain (DESIGN 決定 12) の artifacts/calibration/daily/ と champion.json は
 # 上の artifacts/calibration/* で除外済み (機械ローカルの as-of キャッシュ。pointer は
 # ローカル daily/ を指すためコミットしても他機で解決できない — コミットしない)。
@@ -23,3 +17,4 @@ scripts/board_recorder_universe_next.txt
 *.duckdb
 *.duckdb.wal
 .pytest_cache/
+artifacts/cache/

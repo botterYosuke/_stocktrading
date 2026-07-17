@@ -126,3 +126,23 @@ uv run python scripts/build_board_universe.py --apply    # 明示適用（原子
 - `src/scalp_agent/runtime/daily_model.py` — champion 解決 + フォールバックローダ。
 - `scripts/build_board_universe.py` — 提案/適用モードで再移植。
 - DESIGN.md は変更していない（決定 12 の本文が正本。本書は OPS 状態の記録）。
+
+## pitfalls（実発生した事故と対策）
+
+### 2026-07-17 (1) — 同居トレーダー由来の録画混入で学習がハードエラー
+
+agree_biggap 共存契約（2026-07-16）下では、同居トレーダーのスキャン register 由来で
+universe 外の疎銘柄が録画へ混入する（実測: 188 銘柄・1〜138 行。正規 universe 銘柄の
+最小は ~30k 行/日）。疎銘柄は `exec_subset` 後に空になり `features.trailing_realized_vol`
+が IndexError で落ちる。対策: `load_training_tables` が銘柄別行数 `CODE_ROW_FLOOR = 5,000`
+未満を学習から除外してログする（`db_code_counts`）。録画自体は健全（recording check は
+universe カバレッジで判定しており影響なし）。
+
+### 2026-07-17 (2) — shadow model.txt の CRLF 破損（git autocrlf）
+
+`core.autocrlf=true` の環境で model.txt を git checkout すると LF→CRLF 変換され、
+LightGBM が `Model format error, expect a tree here` でロード不能になる（= 08:45 の
+paper 起動が死ぬ）。実発生: 2026-07-17 朝 07:50 modelfail → 08:54 checkout 復旧が
+CRLF 化して silent 破損。対策: `.gitattributes` に `artifacts/calibration/** -text` を
+追加済み。壊れた場合の復旧は `git show HEAD:<path> > <path>`（バイト直書き）→
+`lgb.Booster(model_file=...)` でロード検証。

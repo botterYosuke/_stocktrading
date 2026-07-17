@@ -1,0 +1,3 @@
+# LightGBM model.txt は LF 必須 (CRLF になるとパーサが "expect a tree here" で落ちる)。
+# core.autocrlf=true の checkout 事故 (2026-07-17 shadow_h5_m30 破損) の再発防止。
+artifacts/calibration/** -text

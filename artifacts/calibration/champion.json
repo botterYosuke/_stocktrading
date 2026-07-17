@@ -1,0 +1,10 @@
+{
+ "model_dir": "artifacts/calibration/daily/20260717",
+ "model_sha256": "b99a41abdd114e83d6ecd980d433a3a06e7c0c70b35ef564681a6af8069a35d8",
+ "promoted_at": "2026-07-17T17:31:45",
+ "train_days": [
+  "2026-07-13",
+  "2026-07-17"
+ ],
+ "previous": null
+}
