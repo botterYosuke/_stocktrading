@@ -13,6 +13,7 @@ from scalp_agent_bars.thrust.detect import (
     SIDE_UP,
     TP_BPS,
     first_touch_race,
+    race_on_paths,
     forward_paths,
     rolling_median,
     thrust_signals,
@@ -182,6 +183,55 @@ def test_race_timeout_when_neither_touched():
     low = close.copy()
     out = first_touch_race(close, high, low, np.array([20]), SIDE_DOWN, horizon=5)
     assert out[0] == 0
+
+
+def _paths_from_bars(close, high, low, idx, side, horizon):
+    """forward_paths と同じ規約で (ret_close, ret_worst) を組む (テスト用)。"""
+    fp = forward_paths(close, high, low, idx, side, horizon=horizon)
+    n = len(close)
+    entry_i = np.asarray(idx) + 1
+    epx = fp["entry_px"]
+    rc = np.full((len(idx), horizon), np.nan)
+    rw = np.full((len(idx), horizon), np.nan)
+    for j in range(len(idx)):
+        for h in range(1, horizon + 1):
+            k = entry_i[j] + h
+            if k >= n or not np.isfinite(epx[j]):
+                break
+            rc[j, h - 1] = side * (close[k] - epx[j]) / epx[j] * 1e4
+            wp = high[k] if side == SIDE_DOWN else low[k]
+            rw[j, h - 1] = side * (wp - epx[j]) / epx[j] * 1e4
+    return rc, rw
+
+
+def test_race_on_paths_matches_first_touch_race():
+    """判定が乗っている等価性: 経路版と bar 版は同じ答えを出す。"""
+    rng = np.random.default_rng(7)
+    for side in (SIDE_DOWN, SIDE_UP):
+        for trial in range(20):
+            n = 60
+            close = 1000.0 + np.cumsum(rng.normal(0, 3, n))
+            high = close + np.abs(rng.normal(0, 2, n))
+            low = close - np.abs(rng.normal(0, 2, n))
+            idx = np.array([25, 30, 35])
+            for tp, stop in ((29.41, 21.0), (10.0, 5.0), (60.0, 30.0), (20.0, 10.0)):
+                a = first_touch_race(close, high, low, idx, side,
+                                     tp_bps=tp, stop_bps=stop, horizon=12)
+                rc, rw = _paths_from_bars(close, high, low, idx, side, 12)
+                b = race_on_paths(rc, rw, tp, stop)
+                assert np.array_equal(a, b), (side, trial, tp, stop, a, b)
+
+
+def test_race_on_paths_stop_priority_and_levels_move_probabilities():
+    # TP を遠くすると TP 先着は減る (確率は水準の関数であって定数ではない)
+    rc = np.array([[10.0, 20.0, 30.0]])
+    rw = np.array([[-1.0, -1.0, -1.0]])
+    assert race_on_paths(rc, rw, 10.0, 21.0)[0] == 1     # TP=10 -> 到達
+    assert race_on_paths(rc, rw, 40.0, 21.0)[0] == 0     # TP=40 -> 未到達
+    # stop を近くすると stop 先着が増える
+    rw2 = np.array([[-5.0, -5.0, -5.0]])
+    assert race_on_paths(rc, rw2, 10.0, 21.0)[0] == 1    # stop=21 -> 触れない
+    assert race_on_paths(rc, rw2, 10.0, 3.0)[0] == -1    # stop=3  -> 先に触れる
 
 
 def test_pit_flags_are_causal_no_lookahead():

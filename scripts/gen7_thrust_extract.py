@@ -359,7 +359,160 @@ def cmd_null() -> None:
               f"差={e_ev - n_ev:+6.2f} bps")
 
 
+PATHS_PATH = ART / "paths.npz"
+
+
+def cmd_paths() -> None:
+    """各イベントの前方経路を丸ごと保存する (TP/stop 格子を後から評価するため)。
+
+    ret_close[e, h] : entry から h bar 後の close 基準リターン bps (side 符号付き)
+    ret_worst[e, h] : 同 h bar 後の **髭** 基準の逆行 bps (short=high / long=low)
+    """
+    uni = json.loads(UNIVERSE_PATH.read_text(encoding="utf-8"))["universe"]
+    by_code: dict[str, dict[str, set[str]]] = {}
+    for name, days in uni.items():
+        for d, codes in days.items():
+            for c in codes:
+                by_code.setdefault(c, {}).setdefault(d, set()).add(name)
+
+    rc: list[np.ndarray] = []
+    rw: list[np.ndarray] = []
+    meta: list[dict] = []
+    t0 = time.time()
+    codes = sorted(by_code)
+    for ci, c in enumerate(codes):
+        recs = _load_minute(c)
+        if recs is None:
+            continue
+        cur_day, buf = None, []
+
+        def flush(dday: str, b: list) -> None:
+            if dday not in by_code[c] or len(b) < U.SPIKE_WINDOW + 5:
+                return
+            h = np.array([x[3] for x in b], dtype=np.float64)
+            lo_ = np.array([x[4] for x in b], dtype=np.float64)
+            cl = np.array([x[5] for x in b], dtype=np.float64)
+            vol = np.array([x[6] for x in b], dtype=np.float64)
+            names = by_code[c][dday]
+            n = cl.size
+            for side, sname in ((D.SIDE_DOWN, "short"), (D.SIDE_UP, "long")):
+                sig, _, _ = D.thrust_signals(cl, vol, side)
+                idx = np.flatnonzero(sig)
+                if idx.size == 0:
+                    continue
+                entry_i = idx + 1
+                ok = entry_i < n
+                idx, entry_i = idx[ok], entry_i[ok]
+                if idx.size == 0:
+                    continue
+                epx = cl[entry_i]
+                for j in range(idx.size):
+                    a = np.full(D.MAX_HORIZON, np.nan)
+                    w = np.full(D.MAX_HORIZON, np.nan)
+                    for hh in range(1, D.MAX_HORIZON + 1):
+                        k = entry_i[j] + hh
+                        if k >= n:
+                            break
+                        a[hh - 1] = side * (cl[k] - epx[j]) / epx[j] * 1e4
+                        wp = h[k] if side == D.SIDE_DOWN else lo_[k]
+                        w[hh - 1] = side * (wp - epx[j]) / epx[j] * 1e4
+                    if not np.isfinite(a[0]):
+                        continue
+                    rc.append(a)
+                    rw.append(w)
+                    meta.append({
+                        "code": c, "day": dday, "side": sname,
+                        "split": _split_of(dday), "entry_px": float(epx[j]),
+                        "u1": "U1_newhigh_and_spike" in names,
+                        "u2": "U2_spike_only" in names,
+                        "u3": "U3_newhigh_only" in names,
+                    })
+
+        for rec in recs:
+            d = rec[0]
+            if d != cur_day:
+                if cur_day is not None:
+                    flush(cur_day, buf)
+                cur_day, buf = d, []
+            buf.append(rec)
+        if cur_day is not None:
+            flush(cur_day, buf)
+        if ci % 100 == 0:
+            print(f"  {ci}/{len(codes)} paths={len(rc)} ({time.time() - t0:.0f}s)", flush=True)
+
+    np.savez_compressed(
+        PATHS_PATH,
+        ret_close=np.array(rc), ret_worst=np.array(rw),
+        side=np.array([m["side"] for m in meta]),
+        split=np.array([m["split"] for m in meta]),
+        code=np.array([m["code"] for m in meta]),
+        day=np.array([m["day"] for m in meta]),
+        entry_px=np.array([m["entry_px"] for m in meta]),
+        u1=np.array([m["u1"] for m in meta]),
+        u2=np.array([m["u2"] for m in meta]),
+        u3=np.array([m["u3"] for m in meta]),
+    )
+    print(f"\npaths={len(rc)} -> {PATHS_PATH} ({time.time() - t0:.0f}s)")
+
+
+def cmd_racegrid() -> None:
+    """owner 提案 (2026-07-17) の検定: 「勝ちを 2pip・損切を 1pip にすれば損小利大で成立」。
+
+    反証の要点: P(TP先) と P(stop先) は **TP/stop の水準の関数**であり定数ではない。
+    ドリフトのない過程では optional stopping により任意の (TP, stop) で期待値は 0。
+    利確/損切の比では、エッジは作れない。以下はその直接測定。
+    """
+    z = np.load(PATHS_PATH, allow_pickle=True)
+    rc, rw = z["ret_close"], z["ret_worst"]
+    side = z["side"].astype(str)
+    px = z["entry_px"].astype(float)
+    fr = friction_bps(px)
+
+    print(f"events={rc.shape[0]}  horizon={rc.shape[1]} bars\n")
+    print("=== owner 提案: TP = 2 x stop (損小利大) を各水準で測る ===")
+    print("   1pip を bps で振る。TP は常に stop の 2 倍。")
+    print(f"{'stop':>6} {'TP':>7} | {'P(TP先)':>8} {'P(stop先)':>9} {'P(到達せず)':>10} |"
+          f" {'摩擦0 EV':>9} {'net EV':>8} | {'martingale予測 P(TP)':>20}")
+    for s in ("short", "long"):
+        m = side == s
+        print(f"-- {s} (n={int(m.sum())}) " + "-" * 62)
+        for stop in (5.0, 10.0, 15.0, 20.0, 25.0, 30.0, 40.0):
+            tp = 2.0 * stop
+            r = D.race_on_paths(rc[m], rw[m], tp, stop)
+            p_tp = float((r == 1).mean())
+            p_st = float((r == -1).mean())
+            p_to = float((r == 0).mean())
+            # timeout は最終有効 bar の close で手仕舞い
+            last = np.where(np.isfinite(rc[m]), rc[m], np.nan)
+            with np.errstate(invalid="ignore"):
+                lastv = np.nanmax(np.where(np.isnan(last), -np.inf, np.arange(last.shape[1])), axis=1)
+            del lastv
+            to_ret = np.array([row[np.isfinite(row)][-1] if np.isfinite(row).any() else 0.0
+                               for row in rc[m][r == 0]]) if p_to > 0 else np.array([0.0])
+            ev0 = p_tp * tp - p_st * stop + p_to * float(np.mean(to_ret))
+            net = ev0 - float(np.mean(fr[m]))
+            mart = stop / (tp + stop)   # ドリフト0なら P(TP先) = stop/(TP+stop)
+            print(f"{stop:6.1f} {tp:7.1f} | {p_tp:8.3f} {p_st:9.3f} {p_to:10.3f} |"
+                  f" {ev0:+9.2f} {net:+8.2f} | {mart:20.3f}")
+
+    print("\n=== 対照: TP/stop 比を変えても期待値は動くか (short, 全 n) ===")
+    m = side == "short"
+    print(f"{'TP/stop比':>9} | " + " ".join(f"stop={s:<4.0f}" for s in (10, 20, 30)))
+    for ratio in (0.5, 1.0, 1.5, 2.0, 3.0, 5.0):
+        cells = []
+        for stop in (10.0, 20.0, 30.0):
+            tp = ratio * stop
+            r = D.race_on_paths(rc[m], rw[m], tp, stop)
+            p_tp, p_st, p_to = (r == 1).mean(), (r == -1).mean(), (r == 0).mean()
+            to_ret = np.array([row[np.isfinite(row)][-1] for row in rc[m][r == 0]
+                               if np.isfinite(row).any()]) if p_to > 0 else np.array([0.0])
+            ev0 = p_tp * tp - p_st * stop + p_to * float(np.mean(to_ret))
+            cells.append(f"{ev0:+9.2f}")
+        print(f"{ratio:9.1f} | " + " ".join(cells))
+    print("\n(摩擦ゼロ期待値 bps。比を動かしても符号が変わらないなら、損小利大では救えない)")
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "report"
     {"universe": cmd_universe, "extract": cmd_extract, "report": cmd_report,
-     "null": cmd_null}[cmd]()
+     "null": cmd_null, "paths": cmd_paths, "racegrid": cmd_racegrid}[cmd]()

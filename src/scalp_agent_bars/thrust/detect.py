@@ -156,6 +156,37 @@ def forward_paths(
     }
 
 
+def race_on_paths(
+    ret_close: np.ndarray,
+    ret_worst: np.ndarray,
+    tp_bps: float,
+    stop_bps: float,
+) -> np.ndarray:
+    """事前計算した前方経路に対する先着判定。+1=TP / -1=stop / 0=timeout。
+
+    ret_close[e, h] : entry から h+1 bar 後の close 基準リターン bps (side 符号込み)
+    ret_worst[e, h] : 同 髭 基準の逆行 bps (side 符号込み)
+
+    `first_touch_race` と同一の規約 (TP=close 基準 / stop=髭基準 / 同一 bar は stop
+    優先) を、任意の (TP, stop) 格子へ適用できるようにしたもの。両者の一致は
+    `test_race_on_paths_matches_first_touch_race` で固定する。
+    """
+    ret_close = np.asarray(ret_close, dtype=np.float64)
+    ret_worst = np.asarray(ret_worst, dtype=np.float64)
+    n, h_max = ret_close.shape
+    out = np.zeros(n, dtype=np.int64)
+    done = np.zeros(n, dtype=bool)
+    for h in range(h_max):
+        live = (~done) & np.isfinite(ret_close[:, h])
+        if not live.any():
+            continue
+        hit_stop = live & (ret_worst[:, h] <= -stop_bps)
+        hit_tp = live & (ret_close[:, h] >= tp_bps) & (~hit_stop)
+        out = np.where(hit_stop, -1, np.where(hit_tp, 1, out))
+        done = done | hit_stop | hit_tp
+    return out
+
+
 def first_touch_race(
     close: np.ndarray,
     high: np.ndarray,
