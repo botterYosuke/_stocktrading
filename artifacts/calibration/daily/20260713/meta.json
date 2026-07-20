@@ -1,0 +1,30 @@
+{
+ "calibration_only": true,
+ "policy": "daily_champion_h5_m30_tau070",
+ "purpose": "point-in-time 日次再学習 champion (DESIGN 決定 12)。レシピ凍結・データ窓のみスライド。判定・台帳・セル選択に使用禁止",
+ "horizon_s": 5.0,
+ "mult": 3.0,
+ "tau": 0.7,
+ "train_days": [
+  "2026-07-09",
+  "2026-07-13"
+ ],
+ "config_hash": "28eb2ba6cf0c22d718bba5e744bcc2d22c05e14e7447759650ce6b4f3d4db866",
+ "feature_schema_hash": "a05fcbf696024d42f1154845fae313890690eda8ac096de2170f77beb58f39de",
+ "model_layer": "daily_champion",
+ "n_train_rows": 1402163,
+ "data_hashes": {
+  "2026-07-09": {
+   "path": "S:\\jp\\stocks_board_kabu_push\\2026-07-09.duckdb",
+   "size": 371994624,
+   "mtime": 1783578996.778648
+  },
+  "2026-07-13": {
+   "path": "S:\\jp\\stocks_board_kabu_push\\2026-07-13.duckdb",
+   "size": 477638656,
+   "mtime": 1783924501.6065514
+  }
+ },
+ "git_sha": "51114136a3750fbd68387e767c085a69d31469e3",
+ "trained_at": "2026-07-17T14:25:43"
+}

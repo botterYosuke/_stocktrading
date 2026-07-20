@@ -1,0 +1,9 @@
+{
+ "scope": "isval",
+ "day_range": [
+  "2024-04-01",
+  "2025-03-31"
+ ],
+ "rows": 485949,
+ "config_hash": "516090c5edb43c3d9b97cf3ef23af4cffce373fa26e979df09675438a2bec397"
+}

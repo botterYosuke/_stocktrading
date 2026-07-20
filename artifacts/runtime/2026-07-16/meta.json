@@ -1,0 +1,15 @@
+{
+ "calibration_only": true,
+ "policy": "shadow_h5_m30_tau070",
+ "purpose": "fill-model calibration stimulus (DESIGN 決定 2)。判定・台帳・セル選択に使用禁止",
+ "horizon_s": 5.0,
+ "mult": 3.0,
+ "tau": 0.7,
+ "train_days": [
+  "2026-07-09",
+  "2026-07-13"
+ ],
+ "config_hash": "28eb2ba6cf0c22d718bba5e744bcc2d22c05e14e7447759650ce6b4f3d4db866",
+ "feature_schema_hash": "a05fcbf696024d42f1154845fae313890690eda8ac096de2170f77beb58f39de",
+ "model_version": "8231c489fae0"
+}

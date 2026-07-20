@@ -1,0 +1,5 @@
+{
+ "verdict": "IS-KILL",
+ "reason": "no (cell, alpha) met n>=300, D>=20, net>0, ratio>=3.0, code_share<=0.5 on val",
+ "config_hash": "fe1bf66bd763bc42a21c47f094ed813eae3927f9602cb9b0dc81a960037cc0a3"
+}

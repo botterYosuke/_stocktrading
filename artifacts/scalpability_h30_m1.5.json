@@ -1,0 +1,2069 @@
+{
+ "spec": {
+  "horizon": 30.0,
+  "mult": 1.5,
+  "days": [
+   "2026-07-09",
+   "2026-07-13",
+   "2026-07-14"
+  ]
+ },
+ "ranking": [
+  {
+   "code": "285A",
+   "days": 3,
+   "events_per_hour": 24462.4,
+   "event_rate": 0.8332,
+   "median_spread_bps": 2.83
+  },
+  {
+   "code": "9984",
+   "days": 3,
+   "events_per_hour": 15320.9,
+   "event_rate": 0.7771,
+   "median_spread_bps": 1.64
+  },
+  {
+   "code": "5803",
+   "days": 3,
+   "events_per_hour": 14748.2,
+   "event_rate": 0.7557,
+   "median_spread_bps": 2.05
+  },
+  {
+   "code": "1570",
+   "days": 3,
+   "events_per_hour": 12813.1,
+   "event_rate": 0.8113,
+   "median_spread_bps": 1.38
+  },
+  {
+   "code": "4062",
+   "days": 3,
+   "events_per_hour": 9121.6,
+   "event_rate": 0.7287,
+   "median_spread_bps": 5.16
+  },
+  {
+   "code": "5802",
+   "days": 3,
+   "events_per_hour": 9015.4,
+   "event_rate": 0.7214,
+   "median_spread_bps": 2.06
+  },
+  {
+   "code": "5016",
+   "days": 3,
+   "events_per_hour": 8638.2,
+   "event_rate": 0.661,
+   "median_spread_bps": 2.64
+  },
+  {
+   "code": "6857",
+   "days": 3,
+   "events_per_hour": 8386.0,
+   "event_rate": 0.7044,
+   "median_spread_bps": 3.41
+  },
+  {
+   "code": "5801",
+   "days": 3,
+   "events_per_hour": 7680.3,
+   "event_rate": 0.65,
+   "median_spread_bps": 3.65
+  },
+  {
+   "code": "7013",
+   "days": 3,
+   "events_per_hour": 6618.6,
+   "event_rate": 0.639,
+   "median_spread_bps": 1.79
+  },
+  {
+   "code": "8035",
+   "days": 3,
+   "events_per_hour": 6405.8,
+   "event_rate": 0.6703,
+   "median_spread_bps": 2.86
+  },
+  {
+   "code": "6752",
+   "days": 1,
+   "events_per_hour": 6228.6,
+   "event_rate": 0.5342,
+   "median_spread_bps": 2.42
+  },
+  {
+   "code": "6920",
+   "days": 3,
+   "events_per_hour": 5892.6,
+   "event_rate": 0.6219,
+   "median_spread_bps": 4.55
+  },
+  {
+   "code": "7012",
+   "days": 3,
+   "events_per_hour": 5640.6,
+   "event_rate": 0.5912,
+   "median_spread_bps": 1.85
+  },
+  {
+   "code": "8411",
+   "days": 3,
+   "events_per_hour": 5251.3,
+   "event_rate": 0.5893,
+   "median_spread_bps": 2.39
+  },
+  {
+   "code": "6503",
+   "days": 3,
+   "events_per_hour": 5161.2,
+   "event_rate": 0.6285,
+   "median_spread_bps": 2.91
+  },
+  {
+   "code": "4063",
+   "days": 3,
+   "events_per_hour": 5072.0,
+   "event_rate": 0.5934,
+   "median_spread_bps": 2.76
+  },
+  {
+   "code": "6954",
+   "days": 3,
+   "events_per_hour": 5001.1,
+   "event_rate": 0.5862,
+   "median_spread_bps": 3.41
+  },
+  {
+   "code": "9501",
+   "days": 3,
+   "events_per_hour": 4495.8,
+   "event_rate": 0.5351,
+   "median_spread_bps": 2.09
+  },
+  {
+   "code": "6323",
+   "days": 3,
+   "events_per_hour": 4461.9,
+   "event_rate": 0.5472,
+   "median_spread_bps": 6.48
+  },
+  {
+   "code": "8316",
+   "days": 3,
+   "events_per_hour": 4387.2,
+   "event_rate": 0.5155,
+   "median_spread_bps": 1.46
+  },
+  {
+   "code": "6146",
+   "days": 3,
+   "events_per_hour": 4131.3,
+   "event_rate": 0.5603,
+   "median_spread_bps": 4.66
+  },
+  {
+   "code": "5713",
+   "days": 3,
+   "events_per_hour": 3943.0,
+   "event_rate": 0.5246,
+   "median_spread_bps": 3.75
+  },
+  {
+   "code": "7011",
+   "days": 3,
+   "events_per_hour": 3561.4,
+   "event_rate": 0.4054,
+   "median_spread_bps": 2.65
+  },
+  {
+   "code": "6479",
+   "days": 3,
+   "events_per_hour": 3372.3,
+   "event_rate": 0.4817,
+   "median_spread_bps": 5.55
+  },
+  {
+   "code": "6501",
+   "days": 3,
+   "events_per_hour": 3201.3,
+   "event_rate": 0.4277,
+   "median_spread_bps": 2.11
+  },
+  {
+   "code": "7974",
+   "days": 3,
+   "events_per_hour": 2903.4,
+   "event_rate": 0.4389,
+   "median_spread_bps": 2.81
+  },
+  {
+   "code": "8136",
+   "days": 3,
+   "events_per_hour": 2839.1,
+   "event_rate": 0.3676,
+   "median_spread_bps": 4.3
+  },
+  {
+   "code": "5706",
+   "days": 3,
+   "events_per_hour": 2823.5,
+   "event_rate": 0.4355,
+   "median_spread_bps": 6.76
+  },
+  {
+   "code": "1568",
+   "days": 3,
+   "events_per_hour": 2756.9,
+   "event_rate": 0.3997,
+   "median_spread_bps": 5.1
+  },
+  {
+   "code": "7203",
+   "days": 3,
+   "events_per_hour": 2712.2,
+   "event_rate": 0.3211,
+   "median_spread_bps": 1.77
+  },
+  {
+   "code": "8306",
+   "days": 3,
+   "events_per_hour": 2645.4,
+   "event_rate": 0.2795,
+   "median_spread_bps": 2.86
+  },
+  {
+   "code": "6701",
+   "days": 3,
+   "events_per_hour": 2530.5,
+   "event_rate": 0.3801,
+   "median_spread_bps": 2.28
+  },
+  {
+   "code": "8058",
+   "days": 3,
+   "events_per_hour": 2411.8,
+   "event_rate": 0.3326,
+   "median_spread_bps": 2.26
+  },
+  {
+   "code": "8766",
+   "days": 3,
+   "events_per_hour": 2382.8,
+   "event_rate": 0.3914,
+   "median_spread_bps": 2.6
+  },
+  {
+   "code": "7186",
+   "days": 3,
+   "events_per_hour": 2279.1,
+   "event_rate": 0.3678,
+   "median_spread_bps": 4.39
+  },
+  {
+   "code": "7003",
+   "days": 3,
+   "events_per_hour": 2158.6,
+   "event_rate": 0.3756,
+   "median_spread_bps": 5.86
+  },
+  {
+   "code": "7182",
+   "days": 3,
+   "events_per_hour": 2122.4,
+   "event_rate": 0.3323,
+   "median_spread_bps": 3.04
+  },
+  {
+   "code": "6758",
+   "days": 3,
+   "events_per_hour": 1850.2,
+   "event_rate": 0.2643,
+   "median_spread_bps": 2.96
+  },
+  {
+   "code": "6702",
+   "days": 3,
+   "events_per_hour": 1744.5,
+   "event_rate": 0.3021,
+   "median_spread_bps": 2.99
+  },
+  {
+   "code": "9983",
+   "days": 3,
+   "events_per_hour": 1627.5,
+   "event_rate": 0.3161,
+   "median_spread_bps": 4.04
+  },
+  {
+   "code": "8113",
+   "days": 3,
+   "events_per_hour": 1319.5,
+   "event_rate": 0.3022,
+   "median_spread_bps": 2.78
+  },
+  {
+   "code": "6613",
+   "days": 1,
+   "events_per_hour": 1305.3,
+   "event_rate": 0.2753,
+   "median_spread_bps": 8.3
+  },
+  {
+   "code": "6841",
+   "days": 3,
+   "events_per_hour": 1257.5,
+   "event_rate": 0.3041,
+   "median_spread_bps": 6.09
+  },
+  {
+   "code": "8795",
+   "days": 3,
+   "events_per_hour": 1238.0,
+   "event_rate": 0.272,
+   "median_spread_bps": 4.74
+  },
+  {
+   "code": "6098",
+   "days": 3,
+   "events_per_hour": 1236.9,
+   "event_rate": 0.2365,
+   "median_spread_bps": 4.01
+  },
+  {
+   "code": "3110",
+   "days": 3,
+   "events_per_hour": 969.4,
+   "event_rate": 0.1757,
+   "median_spread_bps": 14.56
+  },
+  {
+   "code": "8366",
+   "days": 1,
+   "events_per_hour": 884.0,
+   "event_rate": 0.2066,
+   "median_spread_bps": 7.29
+  },
+  {
+   "code": "6861",
+   "days": 3,
+   "events_per_hour": 838.1,
+   "event_rate": 0.1808,
+   "median_spread_bps": 5.78
+  },
+  {
+   "code": "3994",
+   "days": 1,
+   "events_per_hour": 812.8,
+   "event_rate": 0.297,
+   "median_spread_bps": 8.45
+  },
+  {
+   "code": "6269",
+   "days": 3,
+   "events_per_hour": 666.6,
+   "event_rate": 0.2003,
+   "median_spread_bps": 7.45
+  },
+  {
+   "code": "1944",
+   "days": 3,
+   "events_per_hour": 561.0,
+   "event_rate": 0.1984,
+   "median_spread_bps": 6.66
+  },
+  {
+   "code": "5985",
+   "days": 1,
+   "events_per_hour": 511.6,
+   "event_rate": 0.1424,
+   "median_spread_bps": 14.23
+  },
+  {
+   "code": "6327",
+   "days": 1,
+   "events_per_hour": 493.8,
+   "event_rate": 0.1724,
+   "median_spread_bps": 19.7
+  },
+  {
+   "code": "6779",
+   "days": 1,
+   "events_per_hour": 407.9,
+   "event_rate": 0.1117,
+   "median_spread_bps": 16.49
+  },
+  {
+   "code": "6522",
+   "days": 1,
+   "events_per_hour": 357.8,
+   "event_rate": 0.1618,
+   "median_spread_bps": 16.33
+  },
+  {
+   "code": "6834",
+   "days": 3,
+   "events_per_hour": 287.3,
+   "event_rate": 0.0885,
+   "median_spread_bps": 24.1
+  },
+  {
+   "code": "7513",
+   "days": 1,
+   "events_per_hour": 242.6,
+   "event_rate": 0.1064,
+   "median_spread_bps": 7.58
+  },
+  {
+   "code": "7220",
+   "days": 1,
+   "events_per_hour": 225.1,
+   "event_rate": 0.0508,
+   "median_spread_bps": 15.12
+  },
+  {
+   "code": "6368",
+   "days": 3,
+   "events_per_hour": 190.2,
+   "event_rate": 0.0937,
+   "median_spread_bps": 17.27
+  },
+  {
+   "code": "9278",
+   "days": 1,
+   "events_per_hour": 129.9,
+   "event_rate": 0.0937,
+   "median_spread_bps": 18.22
+  },
+  {
+   "code": "218A",
+   "days": 1,
+   "events_per_hour": 121.4,
+   "event_rate": 0.0822,
+   "median_spread_bps": 16.49
+  }
+ ],
+ "per_day": [
+  {
+   "day": "2026-07-09",
+   "code": "1568",
+   "snapshots": 39249,
+   "hours": 5.77,
+   "event_rate": 0.3086756825720847,
+   "events_per_hour": 2097.010891398841,
+   "median_spread_bps": 5.130573085013596,
+   "up_share": 0.509630486897578
+  },
+  {
+   "day": "2026-07-09",
+   "code": "1570",
+   "snapshots": 82128,
+   "hours": 5.77,
+   "event_rate": 0.7960927216886853,
+   "events_per_hour": 11323.49611785696,
+   "median_spread_bps": 1.354004468214745,
+   "up_share": 0.5056719890999831
+  },
+  {
+   "day": "2026-07-09",
+   "code": "1944",
+   "snapshots": 16026,
+   "hours": 5.77,
+   "event_rate": 0.17867200700919958,
+   "events_per_hour": 494.9150830024836,
+   "median_spread_bps": 6.352029473416756,
+   "up_share": 0.4066549912434326
+  },
+  {
+   "day": "2026-07-09",
+   "code": "285A",
+   "snapshots": 146495,
+   "hours": 5.77,
+   "event_rate": 0.8047164721389399,
+   "events_per_hour": 20425.848159246718,
+   "median_spread_bps": 2.565418163160595,
+   "up_share": 0.5024739240764158
+  },
+  {
+   "day": "2026-07-09",
+   "code": "3110",
+   "snapshots": 29644,
+   "hours": 5.77,
+   "event_rate": 0.13385826771653545,
+   "events_per_hour": 686.6375251499638,
+   "median_spread_bps": 14.154281670205238,
+   "up_share": 0.4554405453168392
+  },
+  {
+   "day": "2026-07-09",
+   "code": "4062",
+   "snapshots": 70014,
+   "hours": 5.77,
+   "event_rate": 0.7118331522671394,
+   "events_per_hour": 8632.286177425913,
+   "median_spread_bps": 4.9838026414154,
+   "up_share": 0.4975801755125811
+  },
+  {
+   "day": "2026-07-09",
+   "code": "4063",
+   "snapshots": 45394,
+   "hours": 5.77,
+   "event_rate": 0.5702499393351128,
+   "events_per_hour": 4481.06660235301,
+   "median_spread_bps": 2.8640985249892594,
+   "up_share": 0.512495164410058
+  },
+  {
+   "day": "2026-07-09",
+   "code": "5016",
+   "snapshots": 74162,
+   "hours": 5.77,
+   "event_rate": 0.6431058683798521,
+   "events_per_hour": 8259.973323410273,
+   "median_spread_bps": 2.6099438862064464,
+   "up_share": 0.5187097315788369
+  },
+  {
+   "day": "2026-07-09",
+   "code": "5706",
+   "snapshots": 35259,
+   "hours": 5.77,
+   "event_rate": 0.43281928942659964,
+   "events_per_hour": 2641.8762883149566,
+   "median_spread_bps": 5.822416302765649,
+   "up_share": 0.4891732283464567
+  },
+  {
+   "day": "2026-07-09",
+   "code": "5713",
+   "snapshots": 46714,
+   "hours": 5.77,
+   "event_rate": 0.5701429214253573,
+   "events_per_hour": 4612.538957357079,
+   "median_spread_bps": 2.8038693396887706,
+   "up_share": 0.4975571256764883
+  },
+  {
+   "day": "2026-07-09",
+   "code": "5801",
+   "snapshots": 60585,
+   "hours": 5.77,
+   "event_rate": 0.5973633344897655,
+   "events_per_hour": 6268.242094315701,
+   "median_spread_bps": 2.8364770954474543,
+   "up_share": 0.4838629386874637
+  },
+  {
+   "day": "2026-07-09",
+   "code": "5802",
+   "snapshots": 67341,
+   "hours": 5.77,
+   "event_rate": 0.6922196626291149,
+   "events_per_hour": 8073.898984112907,
+   "median_spread_bps": 2.092269065801862,
+   "up_share": 0.5088242871865338
+  },
+  {
+   "day": "2026-07-09",
+   "code": "5803",
+   "snapshots": 108084,
+   "hours": 5.77,
+   "event_rate": 0.7337888382772284,
+   "events_per_hour": 13739.495589410551,
+   "median_spread_bps": 2.009444388626545,
+   "up_share": 0.4774533801004315
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6098",
+   "snapshots": 29473,
+   "hours": 5.77,
+   "event_rate": 0.20361113944710804,
+   "events_per_hour": 1038.01339249085,
+   "median_spread_bps": 4.007212983370066,
+   "up_share": 0.4956579826319305
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6146",
+   "snapshots": 40577,
+   "hours": 5.77,
+   "event_rate": 0.5579542090200336,
+   "events_per_hour": 3920.2862397492363,
+   "median_spread_bps": 4.217333239614817,
+   "up_share": 0.4981649347778023
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6269",
+   "snapshots": 28640,
+   "hours": 5.77,
+   "event_rate": 0.1715045114359656,
+   "events_per_hour": 850.1185397377075,
+   "median_spread_bps": 6.108113610913163,
+   "up_share": 0.49592169657422513
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6323",
+   "snapshots": 42766,
+   "hours": 5.77,
+   "event_rate": 0.5129736312116528,
+   "events_per_hour": 3797.2688330049505,
+   "median_spread_bps": 6.4984295461930035,
+   "up_share": 0.5040401734763753
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6368",
+   "snapshots": 7984,
+   "hours": 5.77,
+   "event_rate": 0.063963737093931,
+   "events_per_hour": 88.06261926822982,
+   "median_spread_bps": 19.336126329358684,
+   "up_share": 0.547244094488189
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6479",
+   "snapshots": 37252,
+   "hours": 5.77,
+   "event_rate": 0.4963992046004192,
+   "events_per_hour": 3202.333825195162,
+   "median_spread_bps": 4.586104104563174,
+   "up_share": 0.4870351323553294
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6501",
+   "snapshots": 39294,
+   "hours": 5.77,
+   "event_rate": 0.37213570208752833,
+   "events_per_hour": 2530.933073523332,
+   "median_spread_bps": 2.101061035823091,
+   "up_share": 0.5181506849315068
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6503",
+   "snapshots": 44191,
+   "hours": 5.77,
+   "event_rate": 0.5737140267391797,
+   "events_per_hour": 4388.8990130907005,
+   "median_spread_bps": 1.7429193899782134,
+   "up_share": 0.49146852042025435
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6701",
+   "snapshots": 35059,
+   "hours": 5.77,
+   "event_rate": 0.3403154826541693,
+   "events_per_hour": 2064.420870967486,
+   "median_spread_bps": 2.285975540061721,
+   "up_share": 0.537912503148879
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6702",
+   "snapshots": 32406,
+   "hours": 5.77,
+   "event_rate": 0.26239184177997527,
+   "events_per_hour": 1471.9274449806574,
+   "median_spread_bps": 2.961646675551607,
+   "up_share": 0.5357437286538688
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6758",
+   "snapshots": 39036,
+   "hours": 5.77,
+   "event_rate": 0.24316421279433642,
+   "events_per_hour": 1643.3685094387279,
+   "median_spread_bps": 2.9364263691087946,
+   "up_share": 0.48945147679324896
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6834",
+   "snapshots": 19150,
+   "hours": 5.77,
+   "event_rate": 0.05636306598347799,
+   "events_per_hour": 186.87158753234056,
+   "median_spread_bps": 21.90580503833516,
+   "up_share": 0.46289424860853434
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6841",
+   "snapshots": 20920,
+   "hours": 5.77,
+   "event_rate": 0.25002397161760476,
+   "events_per_hour": 904.0181521829478,
+   "median_spread_bps": 5.500045833715281,
+   "up_share": 0.4776605944391179
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6857",
+   "snapshots": 68571,
+   "hours": 5.77,
+   "event_rate": 0.7071230477302584,
+   "events_per_hour": 8397.925769500152,
+   "median_spread_bps": 3.372681281618887,
+   "up_share": 0.5000516049127877
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6861",
+   "snapshots": 24584,
+   "hours": 5.77,
+   "event_rate": 0.14643293925805137,
+   "events_per_hour": 622.669866062032,
+   "median_spread_bps": 5.3043362949210975,
+   "up_share": 0.5094654788418709
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6920",
+   "snapshots": 46742,
+   "hours": 5.77,
+   "event_rate": 0.5523097680594522,
+   "events_per_hour": 4470.550102548546,
+   "median_spread_bps": 4.640371229698376,
+   "up_share": 0.4978091434332467
+  },
+  {
+   "day": "2026-07-09",
+   "code": "6954",
+   "snapshots": 45372,
+   "hours": 5.77,
+   "event_rate": 0.5076023391812865,
+   "events_per_hour": 3987.3759267390724,
+   "median_spread_bps": 2.9364263691087946,
+   "up_share": 0.5330840796452483
+  },
+  {
+   "day": "2026-07-09",
+   "code": "7003",
+   "snapshots": 33757,
+   "hours": 5.77,
+   "event_rate": 0.38964545319685506,
+   "events_per_hour": 2276.6490644378314,
+   "median_spread_bps": 4.468275245755138,
+   "up_share": 0.49821061448260107
+  },
+  {
+   "day": "2026-07-09",
+   "code": "7011",
+   "snapshots": 48957,
+   "hours": 5.77,
+   "event_rate": 0.3669182467120738,
+   "events_per_hour": 3109.7473333392672,
+   "median_spread_bps": 2.6215755669157166,
+   "up_share": 0.5004180835052121
+  },
+  {
+   "day": "2026-07-09",
+   "code": "7012",
+   "snapshots": 51550,
+   "hours": 5.77,
+   "event_rate": 0.5705906345291044,
+   "events_per_hour": 5092.662029980028,
+   "median_spread_bps": 1.81967063961423,
+   "up_share": 0.4836952821839472
+  },
+  {
+   "day": "2026-07-09",
+   "code": "7013",
+   "snapshots": 54637,
+   "hours": 5.77,
+   "event_rate": 0.6111844034007622,
+   "events_per_hour": 5782.252244201759,
+   "median_spread_bps": 1.7681902572716823,
+   "up_share": 0.48593956109845304
+  },
+  {
+   "day": "2026-07-09",
+   "code": "7182",
+   "snapshots": 33049,
+   "hours": 5.77,
+   "event_rate": 0.21792229832111037,
+   "events_per_hour": 1246.5686021007014,
+   "median_spread_bps": 3.046458492003046,
+   "up_share": 0.5110554860241969
+  },
+  {
+   "day": "2026-07-09",
+   "code": "7186",
+   "snapshots": 36931,
+   "hours": 5.77,
+   "event_rate": 0.382927953577917,
+   "events_per_hour": 2448.0433727294203,
+   "median_spread_bps": 2.6784518548279097,
+   "up_share": 0.5106925364679223
+  },
+  {
+   "day": "2026-07-09",
+   "code": "7203",
+   "snapshots": 49224,
+   "hours": 5.77,
+   "event_rate": 0.27881955743573056,
+   "events_per_hour": 2376.404551680243,
+   "median_spread_bps": 1.7691287041132244,
+   "up_share": 0.5183456123714348
+  },
+  {
+   "day": "2026-07-09",
+   "code": "7974",
+   "snapshots": 35373,
+   "hours": 5.77,
+   "event_rate": 0.4194224235560589,
+   "events_per_hour": 2567.9952525458507,
+   "median_spread_bps": 2.789400278940028,
+   "up_share": 0.5090454975023626
+  },
+  {
+   "day": "2026-07-09",
+   "code": "8035",
+   "snapshots": 52857,
+   "hours": 5.77,
+   "event_rate": 0.6705686252225632,
+   "events_per_hour": 6136.9100473214785,
+   "median_spread_bps": 2.829654782116582,
+   "up_share": 0.5094627422179537
+  },
+  {
+   "day": "2026-07-09",
+   "code": "8058",
+   "snapshots": 38695,
+   "hours": 5.77,
+   "event_rate": 0.27841188498071795,
+   "events_per_hour": 1864.7502122109022,
+   "median_spread_bps": 2.2724690376093624,
+   "up_share": 0.4892628056149484
+  },
+  {
+   "day": "2026-07-09",
+   "code": "8113",
+   "snapshots": 28910,
+   "hours": 5.77,
+   "event_rate": 0.3829226877360779,
+   "events_per_hour": 1915.5309854702532,
+   "median_spread_bps": 2.092706916395645,
+   "up_share": 0.4757466063348416
+  },
+  {
+   "day": "2026-07-09",
+   "code": "8136",
+   "snapshots": 38629,
+   "hours": 5.77,
+   "event_rate": 0.245125998133361,
+   "events_per_hour": 1639.0262194452516,
+   "median_spread_bps": 4.410143329658214,
+   "up_share": 0.4988894764674775
+  },
+  {
+   "day": "2026-07-09",
+   "code": "8306",
+   "snapshots": 42679,
+   "hours": 5.77,
+   "event_rate": 0.1479256617232964,
+   "events_per_hour": 1092.7996211282293,
+   "median_spread_bps": 2.9364263691087946,
+   "up_share": 0.4960342639593909
+  },
+  {
+   "day": "2026-07-09",
+   "code": "8316",
+   "snapshots": 42982,
+   "hours": 5.77,
+   "event_rate": 0.4480501327866561,
+   "events_per_hour": 3334.0847323870107,
+   "median_spread_bps": 1.4769957905619968,
+   "up_share": 0.5258150054593668
+  },
+  {
+   "day": "2026-07-09",
+   "code": "8411",
+   "snapshots": 45502,
+   "hours": 5.77,
+   "event_rate": 0.5519934870621369,
+   "events_per_hour": 4348.814029140838,
+   "median_spread_bps": 2.4254183846713557,
+   "up_share": 0.5144098537090923
+  },
+  {
+   "day": "2026-07-09",
+   "code": "8766",
+   "snapshots": 36687,
+   "hours": 5.77,
+   "event_rate": 0.34980614863757986,
+   "events_per_hour": 2220.9518377268523,
+   "median_spread_bps": 2.557871850620284,
+   "up_share": 0.502107399313144
+  },
+  {
+   "day": "2026-07-09",
+   "code": "8795",
+   "snapshots": 25364,
+   "hours": 5.77,
+   "event_rate": 0.30500908588133047,
+   "events_per_hour": 1338.447608633223,
+   "median_spread_bps": 4.044489383215369,
+   "up_share": 0.5387903121357337
+  },
+  {
+   "day": "2026-07-09",
+   "code": "9501",
+   "snapshots": 46898,
+   "hours": 5.77,
+   "event_rate": 0.46787071431621197,
+   "events_per_hour": 3799.1829999739866,
+   "median_spread_bps": 2.1424745581151092,
+   "up_share": 0.5376437306077751
+  },
+  {
+   "day": "2026-07-09",
+   "code": "9983",
+   "snapshots": 26288,
+   "hours": 5.77,
+   "event_rate": 0.25358340957609027,
+   "events_per_hour": 1153.1204690801528,
+   "median_spread_bps": 4.588208304657031,
+   "up_share": 0.5380336740829825
+  },
+  {
+   "day": "2026-07-09",
+   "code": "9984",
+   "snapshots": 93041,
+   "hours": 5.77,
+   "event_rate": 0.7299608467429654,
+   "events_per_hour": 11764.155172848728,
+   "median_spread_bps": 1.7302534821351327,
+   "up_share": 0.4845644902229492
+  },
+  {
+   "day": "2026-07-13",
+   "code": "1568",
+   "snapshots": 47771,
+   "hours": 6.74,
+   "event_rate": 0.408236403646652,
+   "events_per_hour": 2889.39287115662,
+   "median_spread_bps": 5.032459362890644,
+   "up_share": 0.46480825504389345
+  },
+  {
+   "day": "2026-07-13",
+   "code": "1570",
+   "snapshots": 112334,
+   "hours": 6.74,
+   "event_rate": 0.7993140922857652,
+   "events_per_hour": 13310.193654476934,
+   "median_spread_bps": 1.386866375424728,
+   "up_share": 0.4835006853818636
+  },
+  {
+   "day": "2026-07-13",
+   "code": "1944",
+   "snapshots": 19816,
+   "hours": 6.74,
+   "event_rate": 0.239138131606899,
+   "events_per_hour": 701.7307362353913,
+   "median_spread_bps": 5.4495912806539515,
+   "up_share": 0.4572758037225042
+  },
+  {
+   "day": "2026-07-13",
+   "code": "285A",
+   "snapshots": 212252,
+   "hours": 6.74,
+   "event_rate": 0.8425410979564135,
+   "events_per_hour": 26520.529574877746,
+   "median_spread_bps": 2.9112081513828243,
+   "up_share": 0.45400996828273676
+  },
+  {
+   "day": "2026-07-13",
+   "code": "3110",
+   "snapshots": 41157,
+   "hours": 6.74,
+   "event_rate": 0.161018804583161,
+   "events_per_hour": 981.8914049254456,
+   "median_spread_bps": 14.609203798392988,
+   "up_share": 0.5047590270433601
+  },
+  {
+   "day": "2026-07-13",
+   "code": "4062",
+   "snapshots": 83804,
+   "hours": 6.74,
+   "event_rate": 0.7204814673290026,
+   "events_per_hour": 8951.651440810072,
+   "median_spread_bps": 5.103342689461597,
+   "up_share": 0.4681616282153275
+  },
+  {
+   "day": "2026-07-13",
+   "code": "4063",
+   "snapshots": 60872,
+   "hours": 6.74,
+   "event_rate": 0.6303368199460562,
+   "events_per_hour": 5687.275540834859,
+   "median_spread_bps": 2.714440825190011,
+   "up_share": 0.4940642366999765
+  },
+  {
+   "day": "2026-07-13",
+   "code": "5016",
+   "snapshots": 92493,
+   "hours": 6.74,
+   "event_rate": 0.6828268184227894,
+   "events_per_hour": 9361.83995785457,
+   "median_spread_bps": 2.6374785704866146,
+   "up_share": 0.48501893429245957
+  },
+  {
+   "day": "2026-07-13",
+   "code": "5706",
+   "snapshots": 43101,
+   "hours": 6.74,
+   "event_rate": 0.4158905636714123,
+   "events_per_hour": 2656.534640053323,
+   "median_spread_bps": 8.46620572879921,
+   "up_share": 0.47690847154743954
+  },
+  {
+   "day": "2026-07-13",
+   "code": "5713",
+   "snapshots": 48590,
+   "hours": 6.74,
+   "event_rate": 0.47665149236822046,
+   "events_per_hour": 3434.4435779371734,
+   "median_spread_bps": 4.204919756114654,
+   "up_share": 0.4722126188418323
+  },
+  {
+   "day": "2026-07-13",
+   "code": "5801",
+   "snapshots": 84848,
+   "hours": 6.74,
+   "event_rate": 0.6722417494279446,
+   "events_per_hour": 8454.52677050356,
+   "median_spread_bps": 5.167958656330749,
+   "up_share": 0.4850861494192371
+  },
+  {
+   "day": "2026-07-13",
+   "code": "5802",
+   "snapshots": 85144,
+   "hours": 6.74,
+   "event_rate": 0.7264841739048671,
+   "events_per_hour": 9173.954828671795,
+   "median_spread_bps": 2.024086630907803,
+   "up_share": 0.49187833683869925
+  },
+  {
+   "day": "2026-07-13",
+   "code": "5803",
+   "snapshots": 140214,
+   "hours": 6.74,
+   "event_rate": 0.7728874998216095,
+   "events_per_hour": 16067.845582204238,
+   "median_spread_bps": 2.0163322915616493,
+   "up_share": 0.4816090256107244
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6098",
+   "snapshots": 34673,
+   "hours": 6.74,
+   "event_rate": 0.22013287117273253,
+   "events_per_hour": 1131.1188646118578,
+   "median_spread_bps": 4.099200655872105,
+   "up_share": 0.5532082403884004
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6146",
+   "snapshots": 51386,
+   "hours": 6.74,
+   "event_rate": 0.5704938463935192,
+   "events_per_hour": 4345.643260354167,
+   "median_spread_bps": 5.410523468145542,
+   "up_share": 0.4783246859639541
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6269",
+   "snapshots": 19548,
+   "hours": 6.74,
+   "event_rate": 0.2751922091235264,
+   "events_per_hour": 796.8741819744955,
+   "median_spread_bps": 6.088897909478384,
+   "up_share": 0.4444030545725461
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6323",
+   "snapshots": 61150,
+   "hours": 6.74,
+   "event_rate": 0.587313017577166,
+   "events_per_hour": 5326.257862207993,
+   "median_spread_bps": 6.237654641854663,
+   "up_share": 0.4957922309535752
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6368",
+   "snapshots": 15304,
+   "hours": 6.74,
+   "event_rate": 0.11954670509629241,
+   "events_per_hour": 270.74277492900814,
+   "median_spread_bps": 15.673981576291053,
+   "up_share": 0.4876712328767123
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6479",
+   "snapshots": 52777,
+   "hours": 6.74,
+   "event_rate": 0.4557230915125652,
+   "events_per_hour": 3564.621650689402,
+   "median_spread_bps": 4.788125448886761,
+   "up_share": 0.46004661228566673
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6501",
+   "snapshots": 53104,
+   "hours": 6.74,
+   "event_rate": 0.46244038530415277,
+   "events_per_hour": 3638.9985439551315,
+   "median_spread_bps": 2.120665889089174,
+   "up_share": 0.4964536116093266
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6503",
+   "snapshots": 59890,
+   "hours": 6.74,
+   "event_rate": 0.6282066280060832,
+   "events_per_hour": 5576.096527811367,
+   "median_spread_bps": 3.4170510849137194,
+   "up_share": 0.47063048683160413
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6701",
+   "snapshots": 43260,
+   "hours": 6.74,
+   "event_rate": 0.3553194936240135,
+   "events_per_hour": 2278.694879169987,
+   "median_spread_bps": 2.322071287588529,
+   "up_share": 0.504787337979548
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6702",
+   "snapshots": 39250,
+   "hours": 6.74,
+   "event_rate": 0.2294149166900564,
+   "events_per_hour": 1334.449080290209,
+   "median_spread_bps": 3.0234315948601664,
+   "up_share": 0.5021688355021688
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6758",
+   "snapshots": 45894,
+   "hours": 6.74,
+   "event_rate": 0.2663670673444011,
+   "events_per_hour": 1811.1420654521783,
+   "median_spread_bps": 3.0052592036063115,
+   "up_share": 0.47936117936117933
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6834",
+   "snapshots": 18437,
+   "hours": 6.74,
+   "event_rate": 0.08086238731400022,
+   "events_per_hour": 220.8786959311312,
+   "median_spread_bps": 26.654820079964463,
+   "up_share": 0.4694425789120215
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6841",
+   "snapshots": 29827,
+   "hours": 6.74,
+   "event_rate": 0.3432284495785621,
+   "events_per_hour": 1517.0109752197077,
+   "median_spread_bps": 5.391319974840506,
+   "up_share": 0.49642892084923196
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6857",
+   "snapshots": 77701,
+   "hours": 6.74,
+   "event_rate": 0.6793065251552075,
+   "events_per_hour": 7823.077292576506,
+   "median_spread_bps": 3.4258307639602603,
+   "up_share": 0.4949943117178612
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6861",
+   "snapshots": 35194,
+   "hours": 6.74,
+   "event_rate": 0.22807067459527128,
+   "events_per_hour": 1189.0663093746284,
+   "median_spread_bps": 5.331200852992136,
+   "up_share": 0.5178393213572854
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6920",
+   "snapshots": 72964,
+   "hours": 6.74,
+   "event_rate": 0.6864818166858647,
+   "events_per_hour": 7425.856584788033,
+   "median_spread_bps": 4.4474093840338,
+   "up_share": 0.4997303289986217
+  },
+  {
+   "day": "2026-07-13",
+   "code": "6954",
+   "snapshots": 61704,
+   "hours": 6.74,
+   "event_rate": 0.5944977046733824,
+   "events_per_hour": 5436.5991188692615,
+   "median_spread_bps": 2.90065264684554,
+   "up_share": 0.482878114000382
+  },
+  {
+   "day": "2026-07-13",
+   "code": "7003",
+   "snapshots": 43903,
+   "hours": 6.74,
+   "event_rate": 0.4362376327907719,
+   "events_per_hour": 2839.406819841799,
+   "median_spread_bps": 6.475984889368592,
+   "up_share": 0.4875104515050167
+  },
+  {
+   "day": "2026-07-13",
+   "code": "7011",
+   "snapshots": 62354,
+   "hours": 6.74,
+   "event_rate": 0.45283806343906513,
+   "events_per_hour": 4184.452724402482,
+   "median_spread_bps": 2.669157880688643,
+   "up_share": 0.49758950726692663
+  },
+  {
+   "day": "2026-07-13",
+   "code": "7012",
+   "snapshots": 67881,
+   "hours": 6.74,
+   "event_rate": 0.64032022645849,
+   "events_per_hour": 6442.313127490971,
+   "median_spread_bps": 1.8516803999629665,
+   "up_share": 0.47604245815201124
+  },
+  {
+   "day": "2026-07-13",
+   "code": "7013",
+   "snapshots": 81500,
+   "hours": 6.74,
+   "event_rate": 0.6933014060293485,
+   "events_per_hour": 8374.96601054581,
+   "median_spread_bps": 1.8147173577715272,
+   "up_share": 0.5163215784905861
+  },
+  {
+   "day": "2026-07-13",
+   "code": "7182",
+   "snapshots": 46671,
+   "hours": 6.74,
+   "event_rate": 0.35325912103468243,
+   "events_per_hour": 2443.8628124162774,
+   "median_spread_bps": 3.0326004548900682,
+   "up_share": 0.48506375227686704
+  },
+  {
+   "day": "2026-07-13",
+   "code": "7186",
+   "snapshots": 45220,
+   "hours": 6.74,
+   "event_rate": 0.346384542174808,
+   "events_per_hour": 2322.4032115553796,
+   "median_spread_bps": 5.234231876472127,
+   "up_share": 0.4853674121405751
+  },
+  {
+   "day": "2026-07-13",
+   "code": "7203",
+   "snapshots": 57304,
+   "hours": 6.74,
+   "event_rate": 0.3285876495763822,
+   "events_per_hour": 2790.140462634713,
+   "median_spread_bps": 1.78173719376392,
+   "up_share": 0.46278575225943647
+  },
+  {
+   "day": "2026-07-13",
+   "code": "7974",
+   "snapshots": 46408,
+   "hours": 6.74,
+   "event_rate": 0.47432467420384916,
+   "events_per_hour": 3261.5348004111956,
+   "median_spread_bps": 2.821670428893905,
+   "up_share": 0.5149654294032023
+  },
+  {
+   "day": "2026-07-13",
+   "code": "8035",
+   "snapshots": 65315,
+   "hours": 6.74,
+   "event_rate": 0.6847436329645408,
+   "events_per_hour": 6632.211629521758,
+   "median_spread_bps": 2.837684449489217,
+   "up_share": 0.49421506098243256
+  },
+  {
+   "day": "2026-07-13",
+   "code": "8058",
+   "snapshots": 50709,
+   "hours": 6.74,
+   "event_rate": 0.38398499210110587,
+   "events_per_hour": 2884.3289118880466,
+   "median_spread_bps": 2.254537256228159,
+   "up_share": 0.4716893803034199
+  },
+  {
+   "day": "2026-07-13",
+   "code": "8113",
+   "snapshots": 26556,
+   "hours": 6.74,
+   "event_rate": 0.23297491039426524,
+   "events_per_hour": 916.5045066660425,
+   "median_spread_bps": 3.153082137790406,
+   "up_share": 0.5306882591093117
+  },
+  {
+   "day": "2026-07-13",
+   "code": "8136",
+   "snapshots": 49719,
+   "hours": 6.74,
+   "event_rate": 0.38134552264352306,
+   "events_per_hour": 2809.253574831201,
+   "median_spread_bps": 4.290924694271616,
+   "up_share": 0.4827331291583061
+  },
+  {
+   "day": "2026-07-13",
+   "code": "8306",
+   "snapshots": 65012,
+   "hours": 6.74,
+   "event_rate": 0.36245630783918203,
+   "events_per_hour": 3491.6178796263325,
+   "median_spread_bps": 2.8292544914415054,
+   "up_share": 0.493988699604911
+  },
+  {
+   "day": "2026-07-13",
+   "code": "8316",
+   "snapshots": 61457,
+   "hours": 6.74,
+   "event_rate": 0.5835762797439698,
+   "events_per_hour": 5314.975123997235,
+   "median_spread_bps": 1.4483307987544356,
+   "up_share": 0.49892551142865116
+  },
+  {
+   "day": "2026-07-13",
+   "code": "8411",
+   "snapshots": 63215,
+   "hours": 6.74,
+   "event_rate": 0.6163518028789055,
+   "events_per_hour": 5773.750559292918,
+   "median_spread_bps": 2.373605506764776,
+   "up_share": 0.5017984687323365
+  },
+  {
+   "day": "2026-07-13",
+   "code": "8766",
+   "snapshots": 43623,
+   "hours": 6.74,
+   "event_rate": 0.4243940506793977,
+   "events_per_hour": 2743.035232587054,
+   "median_spread_bps": 2.6381743833267377,
+   "up_share": 0.5138453217955652
+  },
+  {
+   "day": "2026-07-13",
+   "code": "8795",
+   "snapshots": 33036,
+   "hours": 6.74,
+   "event_rate": 0.23117497271735177,
+   "events_per_hour": 1131.8066739856272,
+   "median_spread_bps": 4.060913705583756,
+   "up_share": 0.5048518227117755
+  },
+  {
+   "day": "2026-07-13",
+   "code": "9501",
+   "snapshots": 59946,
+   "hours": 6.74,
+   "event_rate": 0.5263887034316999,
+   "events_per_hour": 4677.9784112247235,
+   "median_spread_bps": 2.079218213952027,
+   "up_share": 0.5076259631543901
+  },
+  {
+   "day": "2026-07-13",
+   "code": "9983",
+   "snapshots": 34854,
+   "hours": 6.74,
+   "event_rate": 0.3712610981811913,
+   "events_per_hour": 1916.6411487620053,
+   "median_spread_bps": 3.732039559619332,
+   "up_share": 0.4786007274978717
+  },
+  {
+   "day": "2026-07-13",
+   "code": "9984",
+   "snapshots": 134450,
+   "hours": 6.74,
+   "event_rate": 0.7759636850721834,
+   "events_per_hour": 15467.753044409468,
+   "median_spread_bps": 1.5947691571645004,
+   "up_share": 0.4955214147342578
+  },
+  {
+   "day": "2026-07-14",
+   "code": "1568",
+   "snapshots": 26551,
+   "hours": 3.89,
+   "event_rate": 0.4823289533303126,
+   "events_per_hour": 3284.3134895035505,
+   "median_spread_bps": 5.139010226630351,
+   "up_share": 0.47220917488648817
+  },
+  {
+   "day": "2026-07-14",
+   "code": "1570",
+   "snapshots": 64134,
+   "hours": 3.89,
+   "event_rate": 0.838510771152045,
+   "events_per_hour": 13805.687150710739,
+   "median_spread_bps": 1.404790335042495,
+   "up_share": 0.4830121939867821
+  },
+  {
+   "day": "2026-07-14",
+   "code": "1944",
+   "snapshots": 10570,
+   "hours": 3.85,
+   "event_rate": 0.17731100387926957,
+   "events_per_hour": 486.44607374092186,
+   "median_spread_bps": 8.186655751125665,
+   "up_share": 0.5688367129135539
+  },
+  {
+   "day": "2026-07-14",
+   "code": "218A",
+   "snapshots": 3635,
+   "hours": 2.45,
+   "event_rate": 0.08222958057395144,
+   "events_per_hour": 121.40165567455576,
+   "median_spread_bps": 16.488046166529266,
+   "up_share": 0.5369127516778524
+  },
+  {
+   "day": "2026-07-14",
+   "code": "285A",
+   "snapshots": 199557,
+   "hours": 6.43,
+   "event_rate": 0.8524683090289796,
+   "events_per_hour": 26440.853421866606,
+   "median_spread_bps": 3.013863773357444,
+   "up_share": 0.5204163896032059
+  },
+  {
+   "day": "2026-07-14",
+   "code": "3110",
+   "snapshots": 20760,
+   "hours": 3.89,
+   "event_rate": 0.23212220508866616,
+   "events_per_hour": 1239.8190345799849,
+   "median_spread_bps": 14.914243102162564,
+   "up_share": 0.5044633589370978
+  },
+  {
+   "day": "2026-07-14",
+   "code": "3994",
+   "snapshots": 6775,
+   "hours": 2.46,
+   "event_rate": 0.29695167286245355,
+   "events_per_hour": 812.788617442297,
+   "median_spread_bps": 8.447729672650475,
+   "up_share": 0.4782173259889835
+  },
+  {
+   "day": "2026-07-14",
+   "code": "4062",
+   "snapshots": 83481,
+   "hours": 6.43,
+   "event_rate": 0.7538596259731536,
+   "events_per_hour": 9780.79666019694,
+   "median_spread_bps": 5.393743257820927,
+   "up_share": 0.4850105021959137
+  },
+  {
+   "day": "2026-07-14",
+   "code": "4063",
+   "snapshots": 56005,
+   "hours": 6.42,
+   "event_rate": 0.5794940556002502,
+   "events_per_hour": 5047.787268957905,
+   "median_spread_bps": 2.7085590465872156,
+   "up_share": 0.5285062010242488
+  },
+  {
+   "day": "2026-07-14",
+   "code": "5016",
+   "snapshots": 81166,
+   "hours": 6.42,
+   "event_rate": 0.6569539364930547,
+   "events_per_hour": 8292.928079626758,
+   "median_spread_bps": 2.6634705020641896,
+   "up_share": 0.5010140083374018
+  },
+  {
+   "day": "2026-07-14",
+   "code": "5706",
+   "snapshots": 44547,
+   "hours": 6.42,
+   "event_rate": 0.45764388489208635,
+   "events_per_hour": 3172.0726917971165,
+   "median_spread_bps": 6.002400960384153,
+   "up_share": 0.48049715071723326
+  },
+  {
+   "day": "2026-07-14",
+   "code": "5713",
+   "snapshots": 46184,
+   "hours": 6.43,
+   "event_rate": 0.5268978078449229,
+   "events_per_hour": 3781.9118304020203,
+   "median_spread_bps": 4.25260472039124,
+   "up_share": 0.5122633744855967
+  },
+  {
+   "day": "2026-07-14",
+   "code": "5801",
+   "snapshots": 78651,
+   "hours": 6.43,
+   "event_rate": 0.6803451874856808,
+   "events_per_hour": 8318.113430738113,
+   "median_spread_bps": 2.940744008234083,
+   "up_share": 0.5032178403053207
+  },
+  {
+   "day": "2026-07-14",
+   "code": "5802",
+   "snapshots": 84558,
+   "hours": 6.43,
+   "event_rate": 0.7454478725167523,
+   "events_per_hour": 9798.483137556716,
+   "median_spread_bps": 2.0749040356883492,
+   "up_share": 0.49351226872071785
+  },
+  {
+   "day": "2026-07-14",
+   "code": "5803",
+   "snapshots": 122143,
+   "hours": 6.43,
+   "event_rate": 0.7603697966610116,
+   "events_per_hour": 14437.338246174404,
+   "median_spread_bps": 2.1319688732544506,
+   "up_share": 0.5129291296146591
+  },
+  {
+   "day": "2026-07-14",
+   "code": "5985",
+   "snapshots": 8866,
+   "hours": 2.46,
+   "event_rate": 0.1423878568192116,
+   "events_per_hour": 511.59247855907034,
+   "median_spread_bps": 14.234875444839858,
+   "up_share": 0.5902943516308672
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6098",
+   "snapshots": 34667,
+   "hours": 6.42,
+   "event_rate": 0.2857431574084767,
+   "events_per_hour": 1541.4511561136349,
+   "median_spread_bps": 3.922337713277113,
+   "up_share": 0.5124785288471254
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6146",
+   "snapshots": 48104,
+   "hours": 6.43,
+   "event_rate": 0.5523264286457791,
+   "events_per_hour": 4127.911182521868,
+   "median_spread_bps": 4.3393360815795186,
+   "up_share": 0.49530737627680826
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6269",
+   "snapshots": 8815,
+   "hours": 3.85,
+   "event_rate": 0.15422151611438947,
+   "events_per_hour": 352.6831128960515,
+   "median_spread_bps": 10.162601626016261,
+   "up_share": 0.4952170713760118
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6323",
+   "snapshots": 50671,
+   "hours": 6.43,
+   "event_rate": 0.5413175782484982,
+   "events_per_hour": 4262.268921862717,
+   "median_spread_bps": 6.712160196890032,
+   "up_share": 0.4862566161708341
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6327",
+   "snapshots": 7057,
+   "hours": 2.46,
+   "event_rate": 0.1724481091839636,
+   "events_per_hour": 493.7755085969389,
+   "median_spread_bps": 19.704433497536943,
+   "up_share": 0.5812036273701566
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6368",
+   "snapshots": 8418,
+   "hours": 3.88,
+   "event_rate": 0.09767110266159695,
+   "events_per_hour": 211.65447040247952,
+   "median_spread_bps": 16.798252981689902,
+   "up_share": 0.4793187347931874
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6479",
+   "snapshots": 26409,
+   "hours": 3.88,
+   "event_rate": 0.49297375099428054,
+   "events_per_hour": 3350.071432030462,
+   "median_spread_bps": 7.26832222895215,
+   "up_share": 0.4587014982712255
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6501",
+   "snapshots": 49248,
+   "hours": 6.42,
+   "event_rate": 0.4483985765124555,
+   "events_per_hour": 3433.9988496358637,
+   "median_spread_bps": 2.1081479919890374,
+   "up_share": 0.5142857142857142
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6503",
+   "snapshots": 31343,
+   "hours": 3.88,
+   "event_rate": 0.6836360154479589,
+   "events_per_hour": 5518.664609374829,
+   "median_spread_bps": 3.579738679076428,
+   "up_share": 0.46117932676595547
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6522",
+   "snapshots": 5467,
+   "hours": 2.46,
+   "event_rate": 0.16181885125184095,
+   "events_per_hour": 357.79584259747145,
+   "median_spread_bps": 16.3265306122449,
+   "up_share": 0.5426621160409556
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6613",
+   "snapshots": 11698,
+   "hours": 2.46,
+   "event_rate": 0.27534987550442175,
+   "events_per_hour": 1305.316242832088,
+   "median_spread_bps": 8.29875518672199,
+   "up_share": 0.5441222326161521
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6701",
+   "snapshots": 47025,
+   "hours": 6.43,
+   "event_rate": 0.44453434399352726,
+   "events_per_hour": 3248.3460340183456,
+   "median_spread_bps": 2.24290680722216,
+   "up_share": 0.512118018967334
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6702",
+   "snapshots": 22730,
+   "hours": 3.88,
+   "event_rate": 0.41460946094609463,
+   "events_per_hour": 2427.1171255342374,
+   "median_spread_bps": 2.977519726068185,
+   "up_share": 0.5037147102526003
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6752",
+   "snapshots": 28728,
+   "hours": 2.46,
+   "event_rate": 0.5342245802645816,
+   "events_per_hour": 6228.626856882816,
+   "median_spread_bps": 2.4227740763173835,
+   "up_share": 0.5327670695851029
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6758",
+   "snapshots": 47572,
+   "hours": 6.43,
+   "event_rate": 0.28351014565967836,
+   "events_per_hour": 2096.152528023079,
+   "median_spread_bps": 2.935564362248642,
+   "up_share": 0.4922414433142772
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6779",
+   "snapshots": 8990,
+   "hours": 2.45,
+   "event_rate": 0.11174369278856888,
+   "events_per_hour": 407.9169351001231,
+   "median_spread_bps": 16.488046166529266,
+   "up_share": 0.6743256743256744
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6834",
+   "snapshots": 13731,
+   "hours": 3.88,
+   "event_rate": 0.12840495265841223,
+   "events_per_hour": 454.23019703876685,
+   "median_spread_bps": 23.72479240806643,
+   "up_share": 0.4946114577424844
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6841",
+   "snapshots": 16457,
+   "hours": 3.88,
+   "event_rate": 0.3191295361984074,
+   "events_per_hour": 1351.3885129866096,
+   "median_spread_bps": 7.369196757553427,
+   "up_share": 0.4876190476190476
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6857",
+   "snapshots": 79134,
+   "hours": 6.43,
+   "event_rate": 0.7267976667974138,
+   "events_per_hour": 8937.100516652565,
+   "median_spread_bps": 3.429355281207133,
+   "up_share": 0.5107327518671332
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6861",
+   "snapshots": 26913,
+   "hours": 6.42,
+   "event_rate": 0.16780745480247006,
+   "events_per_hour": 702.5761265483632,
+   "median_spread_bps": 6.701065469409636,
+   "up_share": 0.47262247838616717
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6920",
+   "snapshots": 59301,
+   "hours": 6.42,
+   "event_rate": 0.6268699557626718,
+   "events_per_hour": 5781.509853709684,
+   "median_spread_bps": 4.552697473252903,
+   "up_share": 0.5021143642093355
+  },
+  {
+   "day": "2026-07-14",
+   "code": "6954",
+   "snapshots": 33059,
+   "hours": 3.89,
+   "event_rate": 0.6566405422579962,
+   "events_per_hour": 5579.301200891983,
+   "median_spread_bps": 4.386926957666155,
+   "up_share": 0.4636405529953917
+  },
+  {
+   "day": "2026-07-14",
+   "code": "7003",
+   "snapshots": 29048,
+   "hours": 6.42,
+   "event_rate": 0.30079255685733974,
+   "events_per_hour": 1359.6538435416285,
+   "median_spread_bps": 6.6261733848702375,
+   "up_share": 0.5151792874326956
+  },
+  {
+   "day": "2026-07-14",
+   "code": "7011",
+   "snapshots": 55028,
+   "hours": 6.43,
+   "event_rate": 0.39633625002273926,
+   "events_per_hour": 3389.9040175106607,
+   "median_spread_bps": 2.66844563042028,
+   "up_share": 0.49166934410428237
+  },
+  {
+   "day": "2026-07-14",
+   "code": "7012",
+   "snapshots": 61657,
+   "hours": 6.43,
+   "event_rate": 0.5625568698817106,
+   "events_per_hour": 5386.808256143569,
+   "median_spread_bps": 1.876700760063808,
+   "up_share": 0.508000693200855
+  },
+  {
+   "day": "2026-07-14",
+   "code": "7013",
+   "snapshots": 59852,
+   "hours": 6.43,
+   "event_rate": 0.6124462729750975,
+   "events_per_hour": 5698.683055716182,
+   "median_spread_bps": 1.780785326328911,
+   "up_share": 0.5067722555980338
+  },
+  {
+   "day": "2026-07-14",
+   "code": "7182",
+   "snapshots": 24387,
+   "hours": 3.88,
+   "event_rate": 0.4258408531583265,
+   "events_per_hour": 2676.7721431853274,
+   "median_spread_bps": 3.0362835888872017,
+   "up_share": 0.5137738393373146
+  },
+  {
+   "day": "2026-07-14",
+   "code": "7186",
+   "snapshots": 21431,
+   "hours": 3.88,
+   "event_rate": 0.37420077472347973,
+   "events_per_hour": 2066.7770061340734,
+   "median_spread_bps": 5.271481286241434,
+   "up_share": 0.5001247193813919
+  },
+  {
+   "day": "2026-07-14",
+   "code": "7203",
+   "snapshots": 53740,
+   "hours": 6.43,
+   "event_rate": 0.3557452200812493,
+   "events_per_hour": 2970.1453170106115,
+   "median_spread_bps": 1.7663163472577939,
+   "up_share": 0.505552645364065
+  },
+  {
+   "day": "2026-07-14",
+   "code": "7220",
+   "snapshots": 10923,
+   "hours": 2.46,
+   "event_rate": 0.05077586998439078,
+   "events_per_hour": 225.08696222162328,
+   "median_spread_bps": 15.117157974300833,
+   "up_share": 0.6799276672694394
+  },
+  {
+   "day": "2026-07-14",
+   "code": "7513",
+   "snapshots": 5624,
+   "hours": 2.46,
+   "event_rate": 0.10639057479471617,
+   "events_per_hour": 242.58908168371704,
+   "median_spread_bps": 7.578628268283441,
+   "up_share": 0.5956375838926175
+  },
+  {
+   "day": "2026-07-14",
+   "code": "7974",
+   "snapshots": 43829,
+   "hours": 6.43,
+   "event_rate": 0.4230066255426091,
+   "events_per_hour": 2880.726033691134,
+   "median_spread_bps": 2.8240609997175943,
+   "up_share": 0.48236564947339994
+  },
+  {
+   "day": "2026-07-14",
+   "code": "8035",
+   "snapshots": 63256,
+   "hours": 6.42,
+   "event_rate": 0.6555960107646035,
+   "events_per_hour": 6448.3776936553795,
+   "median_spread_bps": 2.902336380786533,
+   "up_share": 0.5162263968706234
+  },
+  {
+   "day": "2026-07-14",
+   "code": "8058",
+   "snapshots": 47688,
+   "hours": 6.43,
+   "event_rate": 0.3354682906341873,
+   "events_per_hour": 2486.2523793246355,
+   "median_spread_bps": 2.2398924851607123,
+   "up_share": 0.5153051643192488
+  },
+  {
+   "day": "2026-07-14",
+   "code": "8113",
+   "snapshots": 15023,
+   "hours": 3.88,
+   "event_rate": 0.2906512185377547,
+   "events_per_hour": 1126.3237771830886,
+   "median_spread_bps": 3.108325130808211,
+   "up_share": 0.5193585337915235
+  },
+  {
+   "day": "2026-07-14",
+   "code": "8136",
+   "snapshots": 33220,
+   "hours": 3.89,
+   "event_rate": 0.4762091188339457,
+   "events_per_hour": 4069.0299641168403,
+   "median_spread_bps": 4.191993292810731,
+   "up_share": 0.49351799152595965
+  },
+  {
+   "day": "2026-07-14",
+   "code": "8306",
+   "snapshots": 65750,
+   "hours": 6.43,
+   "event_rate": 0.3280583648105276,
+   "events_per_hour": 3351.827436732929,
+   "median_spread_bps": 2.804655728509325,
+   "up_share": 0.5540647198105761
+  },
+  {
+   "day": "2026-07-14",
+   "code": "8316",
+   "snapshots": 56410,
+   "hours": 6.43,
+   "event_rate": 0.514851836727447,
+   "events_per_hour": 4512.612793800776,
+   "median_spread_bps": 1.445400014454,
+   "up_share": 0.526208704048555
+  },
+  {
+   "day": "2026-07-14",
+   "code": "8366",
+   "snapshots": 10536,
+   "hours": 2.46,
+   "event_rate": 0.20660135070864644,
+   "events_per_hour": 884.0172220823792,
+   "median_spread_bps": 7.291286912139992,
+   "up_share": 0.5879373848987108
+  },
+  {
+   "day": "2026-07-14",
+   "code": "8411",
+   "snapshots": 60407,
+   "hours": 6.42,
+   "event_rate": 0.5996982858658533,
+   "events_per_hour": 5631.454377885043,
+   "median_spread_bps": 2.3665838362323988,
+   "up_share": 0.5301727712508638
+  },
+  {
+   "day": "2026-07-14",
+   "code": "8766",
+   "snapshots": 21223,
+   "hours": 3.89,
+   "event_rate": 0.4001414093801556,
+   "events_per_hour": 2184.453519055757,
+   "median_spread_bps": 2.5980774227071968,
+   "up_share": 0.5044174814465779
+  },
+  {
+   "day": "2026-07-14",
+   "code": "8795",
+   "snapshots": 17274,
+   "hours": 3.88,
+   "event_rate": 0.2797174454287534,
+   "events_per_hour": 1243.6972405759561,
+   "median_spread_bps": 6.11807892321811,
+   "up_share": 0.4520803146346512
+  },
+  {
+   "day": "2026-07-14",
+   "code": "9278",
+   "snapshots": 3405,
+   "hours": 2.46,
+   "event_rate": 0.09374081692624155,
+   "events_per_hour": 129.86523410067085,
+   "median_spread_bps": 18.223234624145785,
+   "up_share": 0.45454545454545453
+  },
+  {
+   "day": "2026-07-14",
+   "code": "9501",
+   "snapshots": 31861,
+   "hours": 3.88,
+   "event_rate": 0.6109000722066995,
+   "events_per_hour": 5010.134417306889,
+   "median_spread_bps": 2.04436266993695,
+   "up_share": 0.4717097487023999
+  },
+  {
+   "day": "2026-07-14",
+   "code": "9983",
+   "snapshots": 36035,
+   "hours": 6.42,
+   "event_rate": 0.32331286639068707,
+   "events_per_hour": 1812.618010762694,
+   "median_spread_bps": 3.7885963250615644,
+   "up_share": 0.46077167654893875
+  },
+  {
+   "day": "2026-07-14",
+   "code": "9984",
+   "snapshots": 146030,
+   "hours": 6.43,
+   "event_rate": 0.8253417613909038,
+   "events_per_hour": 18730.78182397836,
+   "median_spread_bps": 1.593752490238266,
+   "up_share": 0.5323791803033575
+  }
+ ]
+}

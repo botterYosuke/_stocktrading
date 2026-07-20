@@ -1,0 +1,5 @@
+{
+ "verdict": "IS-KILL",
+ "reason": "no (pattern, cell, tau) met n>=300, D>=20, net>0, ratio>=3.0, code_share<=0.5 on val",
+ "config_hash": "5230658c92120f9cd88996b57b753975f97cad86fb0ecc3a55e92a51faa65351"
+}

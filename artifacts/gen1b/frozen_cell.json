@@ -1,0 +1,5 @@
+{
+ "verdict": "IS-KILL",
+ "reason": "no cell met n>=100, net>0, ratio>=3.0 on IS-val",
+ "config_hash": "2d25ce07205dce80801198511ed3313b49f37960f8833358fd7c201bbfb6beb3"
+}

@@ -1,0 +1,9 @@
+{"event": "startup", "at": "2026-07-16T15:08:46.255420", "session_id": "20260716T150846-5732", "connection_epoch": 0, "day": "2026-07-16"}
+{"event": "registered", "at": "2026-07-16T15:08:46.681385", "session_id": "20260716T150846-5732", "connection_epoch": 1}
+{"event": "disconnect", "at": "2026-07-16T15:15:10.657764", "session_id": "20260716T150846-5732", "connection_epoch": 1}
+{"event": "unresolved_gap", "at": "2026-07-16T15:15:16.913486", "session_id": "20260716T150846-5732", "connection_epoch": 2, "n": 0, "overlap_s": 6.3}
+{"event": "registered", "at": "2026-07-16T15:15:16.915363", "session_id": "20260716T150846-5732", "connection_epoch": 2}
+{"event": "disconnect", "at": "2026-07-16T15:22:53.850794", "session_id": "20260716T150846-5732", "connection_epoch": 2}
+{"event": "unresolved_gap", "at": "2026-07-16T15:23:01.371551", "session_id": "20260716T150846-5732", "connection_epoch": 3, "n": 0, "overlap_s": 7.5}
+{"event": "registered", "at": "2026-07-16T15:23:01.373471", "session_id": "20260716T150846-5732", "connection_epoch": 3}
+{"event": "disconnect", "at": "2026-07-16T15:34:54.412538", "session_id": "20260716T150846-5732", "connection_epoch": 3}

@@ -1,0 +1,5 @@
+{
+ "verdict": "IS-KILL",
+ "reason": "no (model, horizon, K) met n>=300, D>=60, net>0, ratio>=3.0, shares<=0.3, decile_spearman>=0.8, null_gap_z>=2 on val",
+ "config_hash": "516090c5edb43c3d9b97cf3ef23af4cffce373fa26e979df09675438a2bec397"
+}

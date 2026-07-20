@@ -1,0 +1,5 @@
+{
+ "verdict": "IS-KILL",
+ "reason": "no execution cell met candidate conditions (n/D/net>0/shares + control gap_z>=2, ratio>=3 for cfg a)",
+ "config_hash": "38fcaf49c3b2c4e08a9d66ad3562a666e61d759b5c6c000439e7ee000b0a0f66"
+}

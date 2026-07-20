@@ -1,0 +1,5 @@
+{
+ "verdict": "IS-KILL",
+ "reason": "no (half_life, K) met gen4 candidate conditions + gen5 controls (gross > rotation mean, perm_p_net < 0.05) on val",
+ "config_hash": "2d2d3ee94a78e4ff1d2bfbf4ac8ea0ff8d85e378da01e4599cda3df4c6519b60"
+}
